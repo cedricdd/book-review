@@ -18,7 +18,7 @@
                 @foreach ($filters as $filter => $name)
                 <label for="filter_{{ $filter }}" class="relative radio">
                     <span class="font-semibold text-gray-500 leading-tight">{{ $name }}</span>
-                    <input type="radio" name="filter" id="filter_{{ $filter }}" value="{{ $filter }}" class="absolute h-0 w-0 appearance-none" @if(request("filter") ?? "latest" == $filter) checked @endif />
+                    <input type="radio" name="filter" id="filter_{{ $filter }}" value="{{ $filter }}" class="absolute h-0 w-0 appearance-none" @if((request("filter") ?? "latest") == $filter) checked @endif />
                     <span aria-hidden="true" class="hidden absolute inset-0 border-2 border-blue-500 bg-blue-200 bg-opacity-10 rounded-lg"></span>
                 </label>
                 @endforeach
