@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Contracts\Database\Query\Builder;
 
 class BookController extends Controller
 {
@@ -24,8 +25,8 @@ class BookController extends Controller
                     ->minReviews(2);
                 break;
             case "popular-6-months":
-                $query->popular(now()->subMonth(6), now())
-                    ->highestRated(now()->subMonth(6), now())
+                $query->popular(now()->subMonths(6), now())
+                    ->highestRated(now()->subMonths(6), now())
                     ->minReviews(5);
                 break;
             case "highest-rated-month":
@@ -34,8 +35,8 @@ class BookController extends Controller
                     ->minReviews(2);
                 break;
             case "highest-rated-6-months":
-                $query->highestRated(now()->subMonth(6), now())
-                    ->popular(now()->subMonth(6), now())
+                $query->highestRated(now()->subMonths(6), now())
+                    ->popular(now()->subMonths(6), now())
                     ->minReviews(5);
                 break;
             default:
@@ -74,9 +75,10 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
+    public function show(Book $book): View {
+        $book->load(["reviews" => fn(Builder $query) => $query->latest()]);
+
+        return view("books.show", ['book' => $book, 'title' => $book->title]);
     }
 
     /**

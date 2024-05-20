@@ -2,12 +2,6 @@
 
 @push('style')
     <style>
-        .radio:not(:first-child) {
-            margin-left: 3px;
-        }
-        .radio:not(:last-child) {
-            margin-right: 3px;
-        }
         input[type="radio"]:checked + span {
             display: block;
         }
@@ -15,21 +9,23 @@
 @endpush
 
 @section("content")
-    <div class="container mx-auto px-10 pb-20">
+    <div class="container mx-auto pb-20">
+        <h1 class="title">{{ $title }}</h1>
+
         <form action="{{ route("books.index")}}" method="GET" class="mb-6 max-w-screen-md mx-auto">
             <input class="input" type="text" name="title" placeholder="Enter Book Title" value="{{ request("title") }}" />
-            <div class="flex my-2">
+            <div class="flex gap-1 my-2">
                 @foreach ($filters as $filter => $name)
                 <label for="filter_{{ $filter }}" class="relative radio">
                     <span class="font-semibold text-gray-500 leading-tight">{{ $name }}</span>
-                    <input type="radio" name="filter" id="filter_{{ $filter }}" value="{{ $filter }}" class="absolute h-0 w-0 appearance-none" @if(request("filter") == $filter) checked @endif />
+                    <input type="radio" name="filter" id="filter_{{ $filter }}" value="{{ $filter }}" class="absolute h-0 w-0 appearance-none" @if(request("filter") ?? "latest" == $filter) checked @endif />
                     <span aria-hidden="true" class="hidden absolute inset-0 border-2 border-blue-500 bg-blue-200 bg-opacity-10 rounded-lg"></span>
                 </label>
                 @endforeach
             </div>
-            <div class="w-full flex">
-                <button class="btn grow mr-1" type="submit">Submit</button>
-                <a href="{{ route("books.index") }}" class="btn grow ml-1">Clear</a>
+            <div class="w-full flex basis-0 gap-2">
+                <button class="btn grow" type="submit">Submit</button>
+                <a href="{{ route("books.index") }}" class="btn grow">Clear</a>
             </div>
         </form>
 

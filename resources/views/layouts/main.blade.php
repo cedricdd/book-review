@@ -35,9 +35,7 @@
     @stack("style")
 
 </head>
-<body>
-    <h1 class="text-center font-semibold text-5xl py-10 antialiased capitalize underline underline-offset-4 decoration-sky-500/[.33]">{{ $title }}</h1>
-
+<body class="container mx-auto mt-10 mb-10 px-4 max-w-4xl">
     @yield('content')
 </body>
 </html>

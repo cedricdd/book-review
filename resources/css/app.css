@@ -14,4 +14,8 @@
     .radio {
         @apply grow basis-0 bg-white p-5 rounded-lg shadow-md cursor-pointer flex justify-center items-center text-center font-semibold
     }
+
+    .title {
+        @apply text-center font-semibold text-5xl py-10 antialiased capitalize underline underline-offset-4 decoration-sky-500/[.33]
+    }
 }
