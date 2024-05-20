@@ -36,7 +36,7 @@
 
 </head>
 <body>
-    <h1 class="text-center font-semibold text-3xl py-10">{{ $title }}</h1>
+    <h1 class="text-center font-semibold text-5xl py-10 antialiased capitalize underline underline-offset-4 decoration-sky-500/[.33]">{{ $title }}</h1>
 
     @yield('content')
 </body>
