@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Contracts\Database\Query\Builder;
@@ -13,7 +14,7 @@ class BookController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request): View {
-        $title = $request->input("title");
+        $title = $request->input("title", "");
         $filter = $request->input("filter", "latest");
 
         $query = Book::when($title, fn($query) => $query->title($title));
@@ -43,7 +44,7 @@ class BookController extends Controller
                 $query->withCount("reviews")->withAvg("reviews", "rating")->latest();
         }
 
-        $books = $query->get();
+        $books = Cache::remember("books_" . $title . "_" . $filter, 3600, fn() => $query->get());
 
         $filters = [
             'latest' => "Latest",
@@ -76,9 +77,9 @@ class BookController extends Controller
      * Display the specified resource.
      */
     public function show(Book $book): View {
-        $book->load(["reviews" => fn(Builder $query) => $query->latest()]);
+        $reviews = Cache::remember('book-'. $book->id, 3600, fn() => $book->reviews()->latest()->get());
 
-        return view("books.show", ['book' => $book, 'title' => $book->title]);
+        return view("books.show", ['book' => $book, 'title' => $book->title, 'reviews' => $reviews]);
     }
 
     /**

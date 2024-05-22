@@ -36,7 +36,7 @@
                 <span>by <span class="italic">{{ $book->author }}</span></span>
             </div>
             <div class="flex flex-col min-w-32">
-                <span class="font-bold">{{ number_format($book->reviews_avg_rating, 2) }}</span>
+                <span class="font-bold"><x-star-rating :rating="$book->reviews_avg_rating" /></span>
                 <span>out of <span class="italic">{{ $book->reviews_count }}</span> {{ Str::plural("review", $book->reviews_count) }}</span>
             </div>
         </a>
