@@ -9,10 +9,10 @@
 @endpush
 
 @section("content")
-    <div class="container mx-auto pb-20">
+    <div class="container max-w-screen-md mx-auto pb-20">
         <h1 class="title">{{ $title }}</h1>
 
-        <form action="{{ route("books.index")}}" method="GET" class="mb-6 max-w-screen-md mx-auto">
+        <form action="{{ route("books.index")}}" method="GET" class="mb-6">
             <input class="input" type="text" name="title" placeholder="Enter Book Title" value="{{ request("title") }}" />
             <div class="flex gap-1 my-2">
                 @foreach ($filters as $filter => $name)

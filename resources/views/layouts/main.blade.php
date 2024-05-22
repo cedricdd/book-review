@@ -35,7 +35,7 @@
     @stack("style")
 
 </head>
-<body class="container mx-auto mt-10 mb-10 px-4 max-w-4xl">
+<body class="container mx-auto mt-10 mb-10 px-4 max-w-5xl">
     @yield('content')
 </body>
 </html>
