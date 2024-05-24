@@ -76,10 +76,10 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Book $book): View {
+    public function show(Request $request, Book $book): View {
         $reviews = Cache::remember('book-'. $book->id, 3600, fn() => $book->reviews()->latest()->get());
 
-        return view("books.show", ['book' => $book, 'title' => $book->title, 'reviews' => $reviews]);
+        return view("books.show", ['book' => $book, 'title' => $book->title, 'reviews' => $reviews, 'ip_address' => $request->ip()]);
     }
 
     /**

@@ -6,6 +6,7 @@
 
     <div class="w-full text-center mt-8">
         <a href="{{ route("books.reviews.create", $book) }}" class="btn">Add A Review</a>
+        <a href="{{ route("books.index") }}" class="btn">Back To Book List</a>
     </div>
 
     <div class="mt-14 flex items-center">
@@ -20,6 +21,16 @@
                 <div class="float-right">{{ $review->updated_at->format("M j, Y") }}</div>
             </div>
             <div class="self-start text-justify">{{ $review->review }}</div>
+            @if(!empty($review->ip_address) && $ip_address == $review->ip_address)
+            <div class="mt-4 w-full flex justify-end gap-1">
+                <a href="{{ route('books.reviews.edit', [$book, $review]) }}" class="btn w-28">Edit</a>
+                <form action="{{ route('books.reviews.destroy', [$book, $review]) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn w-28">Delete</button>
+                </form>
+            </div>
+            @endif
         </div>
     @empty
         <div class="card">

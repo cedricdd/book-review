@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Review;
+
+use App\Http\Requests\ReviewRequest;
+
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,14 +23,6 @@ class ReviewController extends Controller implements HasMiddleware
     }
 
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Show the form for creating a new resource.
      */
     public function create(Book $book): View
@@ -38,47 +33,44 @@ class ReviewController extends Controller implements HasMiddleware
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Book $book): RedirectResponse
+    public function store(ReviewRequest $request, Book $book): RedirectResponse
     {
-        $validator = $request->validate([
-            'review' => 'required|min:50',
-            'rating' => 'required|integer|min:1|max:5',
-        ]);
-
-        $book->reviews()->create($validator + ['ip_address' => $request->ip()]);
+        $book->reviews()->create($request->validated() + ['ip_address' => $request->ip()]);
 
         return redirect()->route("books.show", $book)->with("success","Your review was successfully added!");
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, Book $book, Review $review): View
     {
-        //
+        if(empty($request->ip()) || $request->ip() != $review->ip_address) abort(403);
+
+        return view("books.reviews.edit", ["book" => $book, "review" => $review, "title" => "Edit your Review for $book->title"]); 
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ReviewRequest $request, Book $book, Review $review): RedirectResponse
     {
-        //
+        if(empty($request->ip()) || $request->ip() != $review->ip_address) abort(403);
+
+        $review->update($request->validated());
+
+        return redirect()->route("books.show", $book)->with("success","Your review was successfully edited!");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, Book $book, Review $review): RedirectResponse
     {
-        //
+        if(empty($request->ip()) || $request->ip() != $review->ip_address) abort(403);
+
+        $review->delete();
+
+        return redirect()->route("books.show", $book)->with("success","Your review was successfully deleted!");
     }
 }
