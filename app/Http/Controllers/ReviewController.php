@@ -25,8 +25,10 @@ class ReviewController extends Controller implements HasMiddleware
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Book $book): View
+    public function create(Request $request, Book $book): View|RedirectResponse
     {
+        if(Review::checkIfExist($book->id, $request->ip())) return redirect()->route('books.show', $book)->with("failure", "You have already added a review for this book!");
+
         return view("books.reviews.create", ["book" => $book, "title" => "Add a Review for $book->title"]);
     }
 
@@ -35,6 +37,8 @@ class ReviewController extends Controller implements HasMiddleware
      */
     public function store(ReviewRequest $request, Book $book): RedirectResponse
     {
+        if(Review::checkIfExist($book->id, $request->ip())) return redirect()->route('books.show', $book)->with("failure", "You have already added a review for this book!");
+
         $book->reviews()->create($request->validated() + ['ip_address' => $request->ip()]);
 
         return redirect()->route("books.show", $book)->with("success","Your review was successfully added!");

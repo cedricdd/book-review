@@ -5,7 +5,11 @@
     <div class="text-2xl">by <span class="italic">{{ $book->author }}</span></div>
 
     <div class="w-full text-center mt-8">
-        <a href="{{ route("books.reviews.create", $book) }}" class="btn">Add A Review</a>
+        @if ($reviews->contains('ip_address', $ip_address))
+        <a href="{{ route("books.reviews.edit", [$book, $reviews->where('ip_address', $ip_address)->first()]) }}" class="btn">Edit Your Review</a> 
+        @else
+        <a href="{{ route("books.reviews.create", $book) }}" class="btn">Add A Review</a> 
+        @endif
         <a href="{{ route("books.index") }}" class="btn">Back To Book List</a>
     </div>
 
@@ -22,8 +26,7 @@
             </div>
             <div class="self-start text-justify">{{ $review->review }}</div>
             @if(!empty($review->ip_address) && $ip_address == $review->ip_address)
-            <div class="mt-4 w-full flex justify-end gap-1">
-                <a href="{{ route('books.reviews.edit', [$book, $review]) }}" class="btn w-28">Edit</a>
+            <div class="mt-4 self-end">
                 <form action="{{ route('books.reviews.destroy', [$book, $review]) }}" method="POST">
                     @csrf
                     @method('DELETE')

@@ -29,9 +29,11 @@
         }
         .card-success {
             background-color: green !important;
-            text-align: center;
             font-weight: bold;
-            position: relative;
+        }
+        .card-failure {
+            background-color: red !important;
+            font-weight: bold;
         }
 
         .card:not(.card-success):hover {
@@ -45,6 +47,10 @@
 <body class="container mx-auto mt-10 mb-10 px-4 max-w-5xl">
     @session('success')
     <div class="card card-success">✅ {{ $value }}</div>
+    @endsession
+
+    @session('failure')
+    <div class="card card-failure">❌ {{ $value }}</div>
     @endsession
 
     @yield('content')
