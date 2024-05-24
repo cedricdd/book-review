@@ -20,6 +20,7 @@ class ReviewFactory extends Factory
             'book_id' => null,
             'review' => $this->faker->paragraphs(3, true),
             'rating' => $this->faker->numberBetween(1, 5),
+            'ip_address' => $this->faker->ipv4(),
             'created_at' => $this->faker->dateTimeBetween('-2 years'),
             'updated_at'=> function(array $attributes) {
                 return $this->faker->dateTimeBetween($attributes['created_at']);

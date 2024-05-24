@@ -18,7 +18,8 @@
         @error("rating") <p class="text-red-600 font-bold mb-2">{{ $message }}</p> @enderror
 
         <div class="flex justify-center mt-10">
-            <button type="submit" class="btn">Add Review</button>
+            <button type="submit" class="btn mr-1 w-32">Add Review</button>
+            <a href="{{ route("books.show", $book) }}" class="btn ml-1 w-32">Cancel</a>
         </div>
     </form>
 @endsection

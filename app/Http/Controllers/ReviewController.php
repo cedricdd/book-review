@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Review;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class ReviewController extends Controller implements HasMiddleware
             'rating' => 'required|integer|min:1|max:5',
         ]);
 
-        $book->reviews()->create($validator);
+        $book->reviews()->create($validator + ['ip_address' => $request->ip()]);
 
         return redirect()->route("books.show", $book)->with("success","Your review was successfully added!");
     }
