@@ -27,7 +27,14 @@
             margin: 10px auto;
             padding: 10px 20px;
         }
-        .card:hover {
+        .card-success {
+            background-color: green !important;
+            text-align: center;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .card:not(.card-success):hover {
             background-color: #575757;
         }
     </style>
@@ -36,6 +43,10 @@
 
 </head>
 <body class="container mx-auto mt-10 mb-10 px-4 max-w-5xl">
+    @session('success')
+    <div class="card card-success">✅ {{ $value }}</div>
+    @endsession
+
     @yield('content')
 </body>
 </html>

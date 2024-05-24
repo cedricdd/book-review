@@ -6,9 +6,18 @@ use App\Models\Book;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ReviewController extends Controller
+class ReviewController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(middleware: 'throttle:reviews', only: ['store'])
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -37,7 +46,7 @@ class ReviewController extends Controller
 
         $book->reviews()->create($validator);
 
-        return redirect()->route("books.show", $book);
+        return redirect()->route("books.show", $book)->with("success","Your review was successfully added!");
     }
 
     /**
