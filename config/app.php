@@ -1,5 +1,8 @@
 <?php
 
+use App\Constants;
+use Illuminate\Support\Facades\Facade;
+
 return [
 
     /*
@@ -123,4 +126,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'aliases' => Facade::defaultAliases()->merge([
+        'Constants' => Constants::class,
+    ])->toArray(),
 ];

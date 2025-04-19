@@ -17,24 +17,24 @@ class DatabaseSeeder extends Seeder
     {
         //Generic books & reviews
         Book::factory()->count(100)->create()->each(function ($book) {
-            $book->reviews()->saveMany(Review::factory()->count(random_int(2, 6))->make());
+            $book->reviews()->saveMany(Review::factory()->count(random_int(0, 10))->make());
         });
 
         //Books with good reviews
         Book::factory()->count(10)->create()->each(function ($book) {
-            $book->reviews()->saveMany(Review::factory()->goodBook()->count(random_int(2, 6))->make());
+            $book->reviews()->saveMany(Review::factory()->goodBook()->count(random_int(5, 10))->make());
         });
 
         //Books with bad reviews
         Book::factory()->count(10)->create()->each(function ($book) {
-            $book->reviews()->saveMany(Review::factory()->badBook()->count(random_int(2, 6))->make());
+            $book->reviews()->saveMany(Review::factory()->badBook()->count(random_int(5, 10))->make());
         });
 
         //Our user's books & reviews
         $johnDoe = User::factory()->johnDoe()->create();
 
         Book::factory()->count(10)->create()->each(function ($book) use ($johnDoe) {
-            $book->reviews()->saveMany(Review::factory()->for($johnDoe, 'user')->count(random_int(2, 6))->make());
+            $book->reviews()->saveMany(Review::factory()->for($johnDoe, 'user')->count(random_int(5, 10))->make());
         });
     }
 }

@@ -21,8 +21,6 @@ class BookFactory extends Factory
             'author' => fake()->name(),
             'published_at' => fake()->date(),
             'summary' => fake()->text(200),
-            'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
-            'updated_at' => fake()->dateTimeBetween('created_at', 'now'),
         ];
     }
 }
