@@ -13,8 +13,10 @@
         @if($book->reviews_count != 0)
             <x-star-rating :rating="$book->rating" :reviewsCount="$book->reviews_count" />
         @else
-            <p class="font-bold">No reviews yet</p>
-            <p>Be the first!</p>
+            <div class="text-center">
+                <p class="font-bold">No reviews yet</p>
+                <p>Be the first!</p>
+            </div>
         @endif
     </div>
 </div>

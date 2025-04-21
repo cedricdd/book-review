@@ -1,6 +1,6 @@
 @props(['rating', 'reviewsCount'])
 
-<div>
+<div class="flex flex-col items-center">
     <div class="flex gap-1" title="{{ $rating }}/5">
         @for ($i = 0; $i < floor($rating); $i++)
             <img src="{{ Vite::asset('resources/images/full.png') }}" alt="star-full">
@@ -16,5 +16,5 @@
             <img src="{{ Vite::asset('resources/images/empty.png') }}" alt="star-empty">
         @endfor
     </div>
-    <p>out of {{ $reviewsCount }} reviews</p>
+    <p>out of {{ $reviewsCount }} {{ Str::plural('review', $reviewsCount) }}</p>
 </div>
