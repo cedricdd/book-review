@@ -15,26 +15,41 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        define('BOOK_COUNT', 500);
+        define('USER_COUNT', 100);
+
+        $books = Book::factory()->count(BOOK_COUNT)->create();
+
         //Generic books & reviews
-        Book::factory()->count(100)->create()->each(function ($book) {
-            $book->reviews()->saveMany(Review::factory()->count(random_int(0, 10))->make());
-        });
+        for ($i = 0; $i < USER_COUNT; $i++) {
+            $user = User::factory()->create();
+
+            foreach ($books->shuffle()->slice(0, random_int(1, 25)) as $book) {
+                Review::factory()->for($book, 'book')->for($user, 'user')->create();
+            }
+        }
+
+        $users = User::select('id')->get();
 
         //Books with good reviews
-        Book::factory()->count(10)->create()->each(function ($book) {
-            $book->reviews()->saveMany(Review::factory()->goodBook()->count(random_int(5, 10))->make());
+        Book::factory()->count(20)->create()->each(function ($book) use ($users) {
+            foreach ($users->shuffle()->slice(0, random_int(6, 12)) as $user) {
+                Review::factory()->goodBook()->for($book, 'book')->for($user, 'user')->create();
+            }
         });
 
         //Books with bad reviews
-        Book::factory()->count(10)->create()->each(function ($book) {
-            $book->reviews()->saveMany(Review::factory()->badBook()->count(random_int(5, 10))->make());
+        Book::factory()->count(20)->create()->each(function ($book) use ($users) {
+            foreach ($users->shuffle()->slice(0, random_int(6, 12)) as $user) {
+                Review::factory()->badBook()->for($book, 'book')->for($user, 'user')->create();
+            }
         });
 
         //Our user's books & reviews
         $johnDoe = User::factory()->johnDoe()->create();
 
-        Book::factory()->count(10)->create()->each(function ($book) use ($johnDoe) {
-            $book->reviews()->saveMany(Review::factory()->for($johnDoe, 'user')->count(random_int(5, 10))->make());
-        });
+        foreach ($books->shuffle()->slice(0, random_int(10, 20)) as $book) {
+            Review::factory()->for($book, 'book')->for($johnDoe, 'user')->create();
+        }
     }
 }

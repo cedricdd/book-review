@@ -17,6 +17,8 @@ return new class extends Migration
             $table->text('summary');
             $table->timestamp('published_at');
             $table->string('author');
+            $table->string('cover_image')->nullable();
+
             $table->timestamps();
         });
     }

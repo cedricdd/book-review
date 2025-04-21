@@ -19,8 +19,9 @@ class BookFactory extends Factory
         return [
             'title' => fake()->sentence(3),
             'author' => fake()->name(),
-            'published_at' => fake()->date(),
+            'published_at' => fake()->dateTimeBetween('-1 year', 'now'),
             'summary' => fake()->text(200),
+            'cover_image' => "https://picsum.photos/seed/" . rand(1, 1000000) . "/600/800",
         ];
     }
 }

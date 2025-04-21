@@ -45,4 +45,8 @@ class Book extends Model
     {
         return $query->withCount('reviews')->having('reviews_count', '>=', $min);
     }
+
+    public function getRatingAttribute() {
+        return round($this->reviews_avg_rating, 2);
+    }
 }
