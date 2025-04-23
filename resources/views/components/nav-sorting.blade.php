@@ -8,7 +8,7 @@
 @endphp
 
 <div class="my-4 p-6 bg-white/10 rounded">
-    <p class="text-center text-3xl mb-4">Order Books By:</p>
+    <p class="text-center text-3xl mb-4">Order By:</p>
     <form action="{{ route('sorting', $type) }}" method="POST" class="flex justify-center items-center flex-wrap gap-2">
         @csrf
         @foreach ($elements as $name => $sorting)

@@ -68,3 +68,29 @@ test('books_index_sorting', function () {
             ->assertViewHas('books', fn($viewBooks) => !$viewBooks->contains($books->last()));
     }
 });
+
+test("books_index_redirect_last_page", function () {
+    $lastPage = 2;
+
+    Book::factory()->count(Constants::BOOKS_PER_PAGE * $lastPage)->create();
+
+    $this->get(route('books.index', ['page' => 10]))
+        ->assertRedirect(route('books.index', ['page' => $lastPage]));
+
+    $this->get(route('books.index', ['page' => $lastPage]))->assertStatus(200);
+});
+
+test('books_show', function () {
+    $book = Book::factory()->has(Review::factory()->count(10), 'reviews')->create();
+
+    $this->get(route('books.show', $book))
+        ->assertStatus(200)
+        ->assertViewIs('books.show')
+        ->assertViewHas('book', fn($viewBook) => $viewBook->is($book))
+        ->assertSeeText($book->title)
+        ->assertSeeText($book->author)
+        ->assertSeeText($book->summary)
+        ->assertViewHas('book', fn($viewBook) => $viewBook->reviews->count() === 10)
+        ->assertSeeText($book->reviews->first()->review)
+        ->assertSeeText($book->reviews->last()->review);
+});
