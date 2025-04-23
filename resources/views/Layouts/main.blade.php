@@ -20,8 +20,8 @@
                     
                 @endauth
                 @guest
-                <span>Register</span>
-                <span>Login</span>
+                <x-nav-link name='register'>Register</x-nav-link>
+                <x-nav-link name='login'>Login</x-nav-link>
                 @endguest
             </div>
         </nav>

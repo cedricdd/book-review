@@ -21,21 +21,21 @@ class Book extends Model
         return $query->where('title', 'like', "%$title%");
     }
 
-    public function scopePopular(Builder $query, string|null $start = null, string|null $end = null): Builder
+    public function scopePopular(Builder $query, ?string $start = null, ?string $end = null): Builder
     {
         return $query->withCount([
             'reviews as popular_order' => fn($query) => $this->filterByDateRange($query, $start, $end),
         ])->orderBy('popular_order', 'desc');
     }
 
-    public function scopeHighestRated(Builder $query, string|null $start = null, string|null $end = null): Builder
+    public function scopeHighestRated(Builder $query, ?string $start = null, ?string $end = null): Builder
     {
         return $query->withAvg([
             'reviews as highest_order' => fn($query) => $this->filterByDateRange($query, $start, $end),
         ], 'rating')->orderBy('highest_order', 'desc');
     }
 
-    private function filterByDateRange(Builder $query, string|null $start, string|null $end): Builder
+    private function filterByDateRange(Builder $query, ?string $start, ?string $end): Builder
     {
         return $query->when($start, fn($query) => $query->where('created_at', '>=', $start))
             ->when($end, fn($query) => $query->where('created_at', '<=', $end));
@@ -65,4 +65,6 @@ class Book extends Model
             default => $query,
         };
     }
+
+
 }

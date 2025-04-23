@@ -3,7 +3,7 @@
 use App\Constants;
 use App\Models\Book;
 use App\Models\Review;
-use PHPUnit\TextUI\Configuration\Constant;
+use Illuminate\Support\Facades\Cache;
 
 test('books_index', function () {
     $this->get(route('books.index'))
@@ -83,6 +83,13 @@ test("books_index_redirect_last_page", function () {
 test('books_show', function () {
     $book = Book::factory()->has(Review::factory()->count(10), 'reviews')->create();
 
+    Cache::shouldReceive('remember')
+        ->once()
+        ->with("book_reviews_{$book->id}", Constants::CACHE_REVIEWS, Mockery::type('Closure'))
+        ->andReturn($book->reviews->sortBy('created_at'));
+
+    Cache::makePartial();
+
     $this->get(route('books.show', $book))
         ->assertStatus(200)
         ->assertViewIs('books.show')
@@ -90,7 +97,15 @@ test('books_show', function () {
         ->assertSeeText($book->title)
         ->assertSeeText($book->author)
         ->assertSeeText($book->summary)
-        ->assertViewHas('book', fn($viewBook) => $viewBook->reviews->count() === 10)
+        ->assertViewHas('reviews', fn($reviews) => $reviews->count() === 10)
         ->assertSeeText($book->reviews->first()->review)
         ->assertSeeText($book->reviews->last()->review);
+});
+
+test('books_show_no_reviews', function () {
+    $book = Book::factory()->create();
+
+    $this->get(route('books.show', $book))
+        ->assertStatus(200)
+        ->assertSeeText('No reviews yet');
 });

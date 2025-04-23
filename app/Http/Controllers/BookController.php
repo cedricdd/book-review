@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Constants;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class BookController extends Controller
 {
@@ -32,12 +33,12 @@ class BookController extends Controller
 
     public function show(Book $book)
     {
-        // Fetch the book with its reviews
-        $book->load(['reviews' => fn($query) => $query->latest(), 'reviews.user']);
+        // Fetch the reviews and cache them for 24 hours
+        $reviews = Cache::remember('book_reviews_' . $book->id, Constants::CACHE_REVIEWS, fn() => $book->reviews()->latest()->with('user')->get());
 
-        $rating = number_format($book->reviews->avg('rating'), 2);
+        $rating = $reviews->count() ? number_format($reviews->avg('rating'), 2) : 0;
 
         // Return the view with the book
-        return view('books.show', compact('book', 'rating'));
+        return view('books.show', compact('book', 'reviews', 'rating'));
     }
 }

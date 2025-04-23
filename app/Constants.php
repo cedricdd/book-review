@@ -17,4 +17,6 @@ class Constants
         'ratings_all' => 'Highest Rated All Time',
     ];
     const BOOK_SORTING_DEFAULT = 'title';
+
+    const CACHE_REVIEWS = 60*60*24; // 24 hours
 }
