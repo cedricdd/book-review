@@ -8,6 +8,8 @@
 
         <x-search-form :$term />
 
+        <x-nav-sorting type="book" />
+
         <div>
             @forelse($books as $book)
                 <x-books.card :$book />

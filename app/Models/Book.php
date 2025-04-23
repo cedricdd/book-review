@@ -24,15 +24,15 @@ class Book extends Model
     public function scopePopular(Builder $query, string|null $start = null, string|null $end = null): Builder
     {
         return $query->withCount([
-            'reviews' => fn($query) => $this->filterByDateRange($query, $start, $end),
-        ])->orderBy('reviews_count', 'desc');
+            'reviews as popular_order' => fn($query) => $this->filterByDateRange($query, $start, $end),
+        ])->orderBy('popular_order', 'desc');
     }
 
     public function scopeHighestRated(Builder $query, string|null $start = null, string|null $end = null): Builder
     {
         return $query->withAvg([
-            'reviews' => fn($query) => $this->filterByDateRange($query, $start, $end),
-        ], 'rating')->orderBy('reviews_avg_rating', 'desc');
+            'reviews as highest_order' => fn($query) => $this->filterByDateRange($query, $start, $end),
+        ], 'rating')->orderBy('highest_order', 'desc');
     }
 
     private function filterByDateRange(Builder $query, string|null $start, string|null $end): Builder
@@ -48,5 +48,21 @@ class Book extends Model
 
     public function getRatingAttribute() {
         return round($this->reviews_avg_rating, 2);
+    }
+
+    public function scopeSetSorting(Builder $query, string $sorting): Builder
+    {
+        return match ($sorting) {
+            'title' => $query->orderBy('title', 'asc'),
+            'newest' => $query->orderBy('created_at', 'desc'),
+            'author' => $query->orderBy('author', 'asc')->orderBy('title', 'asc'),
+            'popular_month' => $query->popular(now()->subMonth(), now())->orderBy('reviews_avg_rating', 'desc'),
+            'popular_6_months' => $query->popular(now()->subMonths(6), now())->orderBy('reviews_avg_rating', 'desc'),
+            'popular_all' => $query->popular()->orderBy('reviews_avg_rating', 'desc'),
+            'ratings_month' => $query->highestRated(now()->subMonth(), now())->orderBy('reviews_count', 'desc'),
+            'ratings_6_months' => $query->highestRated(now()->subMonths(6), now())->orderBy('reviews_count', 'desc'),
+            'ratings_all' => $query->highestRated()->orderBy('reviews_count', 'desc'),
+            default => $query,
+        };
     }
 }

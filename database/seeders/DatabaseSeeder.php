@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         define('BOOK_COUNT', 500);
-        define('USER_COUNT', 100);
+        define('USER_COUNT', 150);
 
         $books = Book::factory()->count(BOOK_COUNT)->create();
 
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         for ($i = 0; $i < USER_COUNT; $i++) {
             $user = User::factory()->create();
 
-            foreach ($books->shuffle()->slice(0, random_int(1, 25)) as $book) {
+            foreach ($books->shuffle()->slice(0, random_int(5, 25)) as $book) {
                 Review::factory()->for($book, 'book')->for($user, 'user')->create();
             }
         }
@@ -33,14 +33,14 @@ class DatabaseSeeder extends Seeder
 
         //Books with good reviews
         Book::factory()->count(20)->create()->each(function ($book) use ($users) {
-            foreach ($users->shuffle()->slice(0, random_int(6, 12)) as $user) {
+            foreach ($users->shuffle()->slice(0, random_int(8, 16)) as $user) {
                 Review::factory()->goodBook()->for($book, 'book')->for($user, 'user')->create();
             }
         });
 
         //Books with bad reviews
         Book::factory()->count(20)->create()->each(function ($book) use ($users) {
-            foreach ($users->shuffle()->slice(0, random_int(6, 12)) as $user) {
+            foreach ($users->shuffle()->slice(0, random_int(8, 16)) as $user) {
                 Review::factory()->badBook()->for($book, 'book')->for($user, 'user')->create();
             }
         });
