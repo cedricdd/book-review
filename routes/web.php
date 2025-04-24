@@ -10,7 +10,7 @@ Route::get('books/show/{book}', [BookController::class, 'show'])->name('books.sh
 
 Route::post('sorting/{type}', [SiteController::class, 'sorting'])->name('sorting')->where('type', '[a-z]+');
 
-Route::get('users/{user}', [UserController::class, 'profile'])->name('users.show');
+Route::get('users/{user}', [UserController::class, 'profile'])->name('users.profile');
 
 Route::get('register', [UserController::class, 'create'])->name('register')->middleware('guest');
 

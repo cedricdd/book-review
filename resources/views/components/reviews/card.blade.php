@@ -5,6 +5,6 @@
     </div>
     <p class="my-4">{{ $review->review}}</p>
     <div class="flex justify-end">
-        <a href="{{ route('users.show', $review->user->id) }}" class="text-blue-500 hover:underline">{{ $review->user->name }}</a>
+        <a href="{{ route('users.profile', $review->user->id) }}" class="text-blue-500 hover:underline">{{ $review->user->name }}</a>
     </div>
 </div>
