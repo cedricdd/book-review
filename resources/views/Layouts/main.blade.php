@@ -15,9 +15,17 @@
             <a href="{{ route('books.index') }}">
                 <img loading="lazy" style="width:50px;" src="{{ Vite::asset("resources/images/logo.jpg") }}" alt="logo" />
             </a>
+            <div>
+                <x-nav-link name='books.index'>Books</x-nav-link>
+            </div>
             <div class="flex items-center gap-1">
                 @auth
-                    
+                    <x-nav-link name='users.profile' :parameters="Auth::user()->id">Profile</x-nav-link>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <x-forms.button>Logout</x-forms.button>
+                    </form>
                 @endauth
                 @guest
                 <x-nav-link name='register'>Register</x-nav-link>
@@ -25,6 +33,9 @@
                 @endguest
             </div>
         </nav>
+
+        <x-flash-message name="failure" />
+        <x-flash-message name="success" />
 
         <main class="mt-10">
             <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
