@@ -1,13 +1,12 @@
 <?php
 
-use App\Models\Book;
 use App\Models\Review;
 use Illuminate\Support\Facades\Cache;
 
 test('review_model_event_update_cache', function() {
     Cache::spy();
 
-    $book = Book::factory()->create();
+    $book = $this->getBooks(1);
 
     // Add a review to the book
     $book->reviews()->save(Review::factory()->make());

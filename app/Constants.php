@@ -5,6 +5,7 @@ namespace App;
 class Constants
 {
     const BOOKS_PER_PAGE = 20;
+    const REVIEW_PER_PAGE = 20;
     const BOOK_SORTING = [
         'title' => 'Title',
         'newest' => 'Newest',
