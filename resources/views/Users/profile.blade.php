@@ -8,6 +8,8 @@
     @if ($reviews->isEmpty())
         <p>No reviews found.</p>
     @else
+        <x-nav-sorting type="review" /> 
+
         @foreach ($reviews as $review)
             <x-reviews.card-with-book :$review />
         @endforeach

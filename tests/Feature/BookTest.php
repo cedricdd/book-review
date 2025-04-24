@@ -73,7 +73,7 @@ test("books_index_redirect_last_page", function () {
 
     $this->getBooks(count: Constants::BOOKS_PER_PAGE * $lastPage);
 
-    $this->get(route('books.index', ['page' => 10]))
+    $this->get(route('books.index', ['page' => $lastPage + 1]))
         ->assertRedirect(route('books.index', ['page' => $lastPage]));
 
     $this->get(route('books.index', ['page' => $lastPage]))->assertStatus(200);

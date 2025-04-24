@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -31,5 +32,15 @@ class Review extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeSetSorting(Builder $query, string $sorting): Builder
+    {
+        return match($sorting) {
+            'oldest' => $query->oldest(),
+            'highest_rated' => $query->orderBy('rating', 'desc')->orderBy('created_at', 'desc'),
+            'lowest_rated' => $query->orderBy('rating', 'asc')->orderBy('created_at', 'desc'),
+            default => $query->latest(),
+        };
     }
 }

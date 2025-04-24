@@ -18,6 +18,13 @@ class Constants
         'ratings_all' => 'Highest Rated All Time',
     ];
     const BOOK_SORTING_DEFAULT = 'title';
+    const REVIEW_SORTING = [
+        'newest' => 'Newest',
+        'oldest' => 'Oldest',
+        'highest_rated' => 'Highest Rated',
+        'lowest_rated' => 'Lowest Rated',
+    ];
+    const REVIEW_SORTING_DEFAULT = 'newest';
 
     const CACHE_REVIEWS = 60*60*24; // 24 hours
 }

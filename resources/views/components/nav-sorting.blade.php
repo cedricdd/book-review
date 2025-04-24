@@ -4,6 +4,9 @@
     if ($type == 'book') {
         $elements = Constants::BOOK_SORTING;
         $session = Session::get('book-sorting', Constants::BOOK_SORTING_DEFAULT);
+    } elseif($type == 'review') {
+        $elements = Constants::REVIEW_SORTING;
+        $session = Session::get('review-sorting', Constants::REVIEW_SORTING_DEFAULT);
     } 
 @endphp
 
