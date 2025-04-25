@@ -61,14 +61,12 @@ abstract class TestCase extends BaseTestCase
             'password' => 'password',
         ];
     }
-    protected function getRegisterFormData(array $override = []): array
+    protected function getReviewFormData(array $override = []): array
     {
-        return array_merge([
-            'name' => $this->user->name,
-            'email' => $this->user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ], $override);
+        return $override + [
+            'review' => 'This is a review',
+            'rating' => 5,
+        ];
     }
 
     /**

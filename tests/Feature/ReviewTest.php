@@ -1,5 +1,6 @@
 <?php
 
+use App\Constants;
 use App\Models\Review;
 use Illuminate\Support\Facades\Cache;
 
@@ -48,4 +49,44 @@ test('review_delete', function() {
     
     // Check if the review was deleted
     $this->assertDatabaseMissing('reviews', ['id' => $review->id]);
+});
+
+test('review_update_cant_be_accessed_by_others', function() {
+    $review = $this->getReviews(count: 1);
+
+    $this->actingAs($this->user)->get(route('reviews.edit', [$review->book, $review]))->assertForbidden();
+    
+    $this->actingAs($this->user)
+        ->put(route('reviews.update', [$review->book, $review]), $this->getReviewFormData())
+        ->assertForbidden();
+});
+
+test('review_update_success', function() {
+    $review = $this->getReviews(count: 1, user: $this->user);
+    
+    $this->actingAs($review->user)
+        ->put(route('reviews.update', [$review->book, $review]), $this->getReviewFormData())
+        ->assertStatus(302)
+        ->assertSessionHasNoErrors();
+    
+    // Check if the review was updated
+    $this->assertDatabaseHas('reviews', ['id' => $review->id] + $this->getReviewFormData());
+});
+
+test('review_form_validation', function() {
+    $book = $this->getBooks(count: 1);
+    
+    $this->checkForm(
+        route('reviews.store', [$book]),
+        $this->getReviewFormData(),
+        [
+            [['review', 'rating'], 'required', ''],
+            ['review', 'min.string', str_repeat('a', Constants::REVIEW_MIN_LENGTH - 1), ['min' => Constants::REVIEW_MIN_LENGTH]],
+            ['review', 'max.string', str_repeat('a', Constants::REVIEW_MAX_LENGTH + 1), ['max' => Constants::REVIEW_MAX_LENGTH]],
+            ['rating', 'numeric', 'rating'],
+            ['rating', 'min.numeric', Constants::REVIEW_MIN_RATING - 1, ['min' => Constants::REVIEW_MIN_RATING]],
+            ['rating', 'max.numeric', Constants::REVIEW_MAX_RATING + 1, ['max' => Constants::REVIEW_MAX_RATING]],
+        ],
+        $this->user
+    );
 });

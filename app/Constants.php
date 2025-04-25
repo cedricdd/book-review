@@ -25,6 +25,10 @@ class Constants
         'lowest_rated' => 'Lowest Rated',
     ];
     const REVIEW_SORTING_DEFAULT = 'newest';
+    const REVIEW_MIN_LENGTH = 10;
+    const REVIEW_MAX_LENGTH = 2048;
+    const REVIEW_MIN_RATING = 0;
+    const REVIEW_MAX_RATING = 5;
 
     const CACHE_REVIEWS = 60*60*24; // 24 hours
 }

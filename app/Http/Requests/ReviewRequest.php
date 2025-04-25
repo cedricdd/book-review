@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Constants;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,8 +24,8 @@ class ReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'review' => "bail|required|min:10",
-            'rating' => "bail|required|numeric|min:0|max:5",
+            'review' => "bail|required|min:" . Constants::REVIEW_MIN_LENGTH . "|max:" . Constants::REVIEW_MAX_LENGTH,
+            'rating' => "bail|required|numeric|min:" . Constants::REVIEW_MIN_RATING . "|max:" . Constants::REVIEW_MAX_RATING,
         ];
     }
 }
