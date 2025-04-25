@@ -5,14 +5,14 @@ namespace App\Http\Requests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class ReviewRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return Auth::guest();
+        return Auth::check();
     }
 
     /**
@@ -23,8 +23,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => "bail|required|email",
-            'password' => "bail|required",
+            'review' => "bail|required|min:10",
+            'rating' => "bail|required|numeric|min:0|max:5",
         ];
     }
 }

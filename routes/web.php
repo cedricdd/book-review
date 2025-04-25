@@ -9,7 +9,8 @@ use App\Http\Controllers\ReviewController;
 Route::get('/', [BookController::class, 'index'])->name('books.index');
 Route::get('books/show/{book}', [BookController::class, 'show'])->name('books.show');
 
-Route::get('reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit')->middleware('auth')->can('update', 'review');
+Route::get('books/{book}/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit')->middleware('auth')->can('update', 'review');
+Route::put('books/{book}/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update')->middleware('auth')->can('update', 'review');
 Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy')->middleware('auth')->can('destroy', 'review');
 
 Route::post('sorting/{type}', [SiteController::class, 'sorting'])->name('sorting')->where('type', '[a-z]+');

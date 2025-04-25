@@ -2,17 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use App\Http\Requests\ReviewRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 
 class ReviewController extends Controller
 {
-    public function edit($id)
+    public function edit(Book $book, Review $review)
     {
-        // Logic to show the edit form for a review
+        if(url()->current() != url()->previous()) {
+            session()->put('url.back', url()->previous());
+        }
+
+        return view('reviews.edit', compact('book', 'review'));
+    }
+
+    public function update(ReviewRequest $request, Book $book, Review $review): RedirectResponse
+    {
+        $review->review = $request->input('review');
+        $review->rating = $request->input('rating');
+        $review->save();
+
+        return redirect()->to(session()->get('url.back', url()->previous()))->with('success', 'Review updated successfully.');
     }
 
     public function destroy(Review $review): RedirectResponse

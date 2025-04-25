@@ -17,7 +17,7 @@
         @canany(['update', 'destroy'], $review)
             <div class="flex justify-end gap-x-2">
                 @can('update', $review)
-                    <x-link-button color='blue' name="reviews.edit" :parameters="$review->id">Edit</x-link-button>
+                    <x-link-button color='blue' href="{{ route('reviews.edit', [$review->book->id, $review->id]) }}">Edit</x-link-button>
                 @endcan
                 @can('destroy', $review)
                     <form action="{{ route('reviews.destroy', $review->id) }}" method="POST">
