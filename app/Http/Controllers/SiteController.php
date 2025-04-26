@@ -34,7 +34,7 @@ class SiteController extends Controller
         //We remove the 'page' parameter.
         unset($parameters['page']);
 
-        $redirectUrl = $parts['path'];
+        $redirectUrl = $parts['path'] ?? route('books.index');
 
         //We still have some parameters
         if (count($parameters)) {

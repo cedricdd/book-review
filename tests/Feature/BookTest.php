@@ -121,7 +121,7 @@ test('books_show_user_review', function () {
         ->assertStatus(200)
         ->assertViewHas('userReview', fn($userReview) => $userReview->is($review))
         ->assertSeeText('Your Review')
-        ->assertSeeText($review->review)
+        ->assertSeeTextInOrder(['Your Review', $review->review, 'Edit', 'Delete'])
         ->assertViewHas('reviews', fn($reviews) => $reviews->count() === 10);
 });
 

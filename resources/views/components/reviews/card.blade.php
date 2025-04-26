@@ -5,6 +5,21 @@
     </div>
     <p class="my-4">{{ $review->review}}</p>
     <div class="flex justify-end">
+        @if(Auth::check() && Auth::user()->id === $review->user->id)
+        <div class="flex justify-end gap-x-2">
+            @can('update', $review)
+                <x-link-button color='blue' href="{{ route('reviews.edit', [$review->book->id, $review->id]) }}">Edit</x-link-button>
+            @endcan
+            @can('destroy', $review)
+                <form action="{{ route('reviews.destroy', $review->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <x-forms.button color='red'>Delete</x-forms.button>
+                </form>
+            @endcan
+        </div>
+        @else
         <a href="{{ route('users.profile', $review->user->id) }}" class="text-blue-500 hover:underline">{{ $review->user->name }}</a>
+        @endif
     </div>
 </div>
