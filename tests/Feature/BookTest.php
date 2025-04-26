@@ -111,3 +111,17 @@ test('books_show_no_reviews', function () {
         ->assertStatus(200)
         ->assertSeeText('No reviews yet');
 });
+
+test('books_show_user_review', function () {
+    $book = $this->getBooks(count: 1, reviewCount: 10);
+    $review = $this->getReviews(count: 1, book: $book, user: $this->user);
+
+    $this->actingAs($this->user)
+        ->get(route('books.show', $book))
+        ->assertStatus(200)
+        ->assertViewHas('userReview', fn($userReview) => $userReview->is($review))
+        ->assertSeeText('Your Review')
+        ->assertSeeText($review->review)
+        ->assertViewHas('reviews', fn($reviews) => $reviews->count() === 10);
+});
+

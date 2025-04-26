@@ -1,12 +1,12 @@
 @props(['action' => 'Edit', 'book', 'review' => null])
 
-<form action="{{ $action === 'Edit' ? route('reviews.update', [$book->id, $review->id]) : route('reviews.store') }}" method="POST">
+<form action="{{ $action === 'Edit' ? route('reviews.update', [$book, $review]) : route('reviews.store', $book) }}" method="POST">
     @csrf
     @if ($action === 'Edit')
         @method('PUT')
     @endif
 
-    <x-forms.text name='review' label='Review' required>{{ old('review', $review?->review) }}</x-forms.text>
+    <x-forms.text name='review' label='Review' required placeholder="Your review of {{ $book->title }} (at least 10 characters)">{{ old('review', $review?->review) }}</x-forms.text>
 
     <div class="relative my-6">
         <input name="rating" id="rating" type="range" value="{{ old('rating', $review?->rating ?? 2.5) }}" min="0" max="5" step="0.5" class="w-full h-2 bg-white rounded-lg cursor-pointer">

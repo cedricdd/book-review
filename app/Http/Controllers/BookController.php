@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Constants;
 use App\Models\Book;
+use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class BookController extends Controller
@@ -38,7 +40,15 @@ class BookController extends Controller
 
         $rating = $reviews->count() ? number_format($reviews->avg('rating'), 2) : 0;
 
+        if(Auth::check()) {
+            $userReview = Review::where('book_id', $book->id)->where('user_id', Auth::id())->first();
+
+            // Filter out the user's own review from the list of reviews
+            $reviews = $reviews->filter(fn($review) => !($review->user_id === Auth::id()));
+        }
+        else $userReview = null;
+
         // Return the view with the book
-        return view('books.show', compact('book', 'reviews', 'rating'));
+        return view('books.show', compact('book', 'reviews', 'rating', 'userReview'));
     }
 }

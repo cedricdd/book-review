@@ -28,7 +28,6 @@
                     </form>
                 @endauth
                 @guest
-                <x-nav-link name='register'>Register</x-nav-link>
                 <x-nav-link name='login'>Login</x-nav-link>
                 @endguest
             </div>

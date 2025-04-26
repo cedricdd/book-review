@@ -19,8 +19,6 @@ Route::post('sorting/{type}', [SiteController::class, 'sorting'])->name('sorting
 
 Route::get('users/{user}', [UserController::class, 'profile'])->name('users.profile');
 
-Route::get('register', [UserController::class, 'create'])->name('register')->middleware('guest');
-
 Route::get('login', [UserController::class, 'login'])->name(('login'))->middleware('guest');
 Route::post('login', [UserController::class, 'loginPost'])->name(('loginPost'))->middleware('guest');
 Route::delete('logout', [UserController::class, 'logout'])->name(('logout'))->middleware('auth');
