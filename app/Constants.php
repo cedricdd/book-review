@@ -29,6 +29,13 @@ class Constants
     const REVIEW_MAX_LENGTH = 2048;
     const REVIEW_MIN_RATING = 0;
     const REVIEW_MAX_RATING = 5;
+    const STRING_MAX_LENGTH = 255;
+    const BOOK_SUMMARY_MIN_LENGTH = 100;
+    const BOOK_SUMMARY_MAX_LENGTH = 4096;
+    const IMAGE_EXTENSIONS_ALLOWED = ["jpg", "png", "webp"];
+    const BOOK_COVER_MAX_WEIGHT = 4096;
+    const BOOK_COVER_MIN_RES = 250;
+    const BOOK_COVER_MAX_RES = 1000;
 
     const CACHE_REVIEWS = 60*60*24; // 24 hours
 }

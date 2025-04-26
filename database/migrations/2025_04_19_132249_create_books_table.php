@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('published_at');
             $table->string('author');
             $table->string('cover_image')->nullable();
-
+            $table->foreignId('user_id')->nullable();
             $table->timestamps();
         });
     }

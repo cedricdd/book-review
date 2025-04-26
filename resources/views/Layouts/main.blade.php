@@ -17,6 +17,10 @@
             </a>
             <div>
                 <x-nav-link name='books.index'>Books</x-nav-link>
+                @auth()
+                    <x-nav-link name='books.create'>Add Book</x-nav-link>
+                    <x-nav-link name='books.owner'>Your Book</x-nav-link>
+                @endauth
             </div>
             <div class="flex items-center gap-1">
                 @auth

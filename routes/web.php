@@ -7,7 +7,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReviewController;
 
 Route::get('/', [BookController::class, 'index'])->name('books.index');
-Route::get('books/show/{book}', [BookController::class, 'show'])->name('books.show');
+Route::get('books/create', [BookController::class, 'create'])->name('books.create')->middleware('auth');
+Route::post('books', [BookController::class, 'store'])->name('books.store')->middleware('auth');
+Route::get('books/owner', [BookController::class, 'owner'])->name('books.owner')->middleware('auth');
+Route::get('books/{book}', [BookController::class, 'show'])->name('books.show');
+Route::delete('books/{book}', [BookController::class, 'destroy'])->name('books.destroy')->middleware('auth')->can('destroy', 'book');
 
 Route::get('books/{book}/reviews/create', [ReviewController::class, 'create'])->name('reviews.create')->middleware('auth');
 Route::post('books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');

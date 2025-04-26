@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Book extends Model
 {
     use HasFactory;
 
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class);
+    }
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
@@ -66,5 +70,8 @@ class Book extends Model
         };
     }
 
-
+    public function getCoverAttribute(): string
+    {
+        return preg_match('/covers\/.*/', $this->cover_image) ? asset('storage/' . $this->cover_image) : $this->cover_image;
+    }
 }

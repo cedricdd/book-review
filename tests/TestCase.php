@@ -9,6 +9,7 @@ use App\Models\Review;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Http\UploadedFile;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -21,13 +22,14 @@ abstract class TestCase extends BaseTestCase
         $this->user = User::factory()->create();
     }
 
-    protected function getBooks(int $count = Constants::BOOKS_PER_PAGE, array $override = [], int $reviewCount = 0): Book|Collection
+    protected function getBooks(int $count = Constants::BOOKS_PER_PAGE, array $override = [], int $reviewCount = 0, ?User $user= null): Book|Collection
     {
         // Disable Eloquent events for the Review model
         // This will prevent any events (like creating, updating, deleting) from being triggered
         $books = Review::withoutEvents(
             fn() => Book::factory()->count($count)
                 ->when($reviewCount, fn($query) => $query->has(Review::factory()->count($reviewCount)))
+                ->when($user, fn($query) => $query->for($user, 'user'))
                 ->create($override)
         );
 
@@ -66,6 +68,20 @@ abstract class TestCase extends BaseTestCase
         return $override + [
             'review' => 'This is a review',
             'rating' => 5,
+        ];
+    }
+
+    protected function getBookFormData(array $override = []): array
+    {
+        $size = (Constants::BOOK_COVER_MIN_RES + Constants::BOOK_COVER_MAX_RES) / 2;
+
+        return $override + [
+            'title' => 'Book Title',
+            'author' => 'Book Author',
+            'published_at' => now()->subYear()->format('Y-m-d'),
+            'summary' => 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum.',
+            'cover' => UploadedFile::fake()->image('cover.jpg', width: $size, height: $size)->size(Constants::BOOK_COVER_MAX_WEIGHT / 2), // Assuming you want to test without a cover image
+            'user_id' => $this->user->id,
         ];
     }
 

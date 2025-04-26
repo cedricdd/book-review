@@ -2,7 +2,11 @@
 
 use App\Constants;
 use App\Models\Book;
+use Illuminate\Support\Arr;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Storage;
 
 test('books_index', function () {
     $this->get(route('books.index'))
@@ -125,3 +129,126 @@ test('books_show_user_review', function () {
         ->assertViewHas('reviews', fn($reviews) => $reviews->count() === 10);
 });
 
+test('book_create_auth', function () {
+    $this->get(route('books.create'))
+        ->assertStatus(302)
+        ->assertRedirect(route('login'));
+});
+
+test('book_create', function () {
+    $this->actingAs($this->user)
+        ->get(route('books.create'))
+        ->assertStatus(200)
+        ->assertViewIs('books.create')
+        ->assertSeeText(['Add A Book', 'Title', 'Author', 'Published Date', 'Summary', 'Cover', 'Create']);
+});
+
+test('book_store_successfull', function () {
+    Storage::fake('public');
+
+    $data = $this->getBookFormData();
+
+    $this->actingAs($this->user)
+        ->post(route('books.store'), $data)
+        ->assertStatus(302)
+        ->assertRedirectToRoute('books.show', 1)
+        ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('books', Arr::except($data, 'cover'));
+
+    //Check if the cover was uploaded
+    Storage::assertExists(Book::find(1)->first()->cover_image);
+});
+
+test('book_store_auth', function () {
+    $this->post(route('books.store'), $this->getBookFormData())
+        ->assertStatus(302)
+        ->assertRedirect(route('login'));
+});
+
+test('book_store_validation', function () {
+    Storage::fake('public');
+
+    $this->checkForm(
+        route('books.store'),
+        $this->getBookFormData(),
+        [
+            [['title', 'author', 'published_at', 'summary', 'cover'], 'required', ''],
+            [['title', 'author'], 'string', 0],
+            [['title', 'author'], 'max.string', str_repeat('a', Constants::STRING_MAX_LENGTH + 1), ['max' => Constants::STRING_MAX_LENGTH]],
+            [['published_at'], 'date', 'invalid-date'],
+            [['summary'], 'min.string', str_repeat('a', Constants::BOOK_SUMMARY_MIN_LENGTH - 1), ['min' => Constants::BOOK_SUMMARY_MIN_LENGTH]],
+            [['summary'], 'max.string', str_repeat('a', Constants::BOOK_SUMMARY_MAX_LENGTH + 1), ['max' => Constants::BOOK_SUMMARY_MAX_LENGTH]],
+        ],
+        $this->user,
+    );
+}); 
+
+test('book_store_validation_cover', function () {
+    Storage::fake('public'); // Create a fake storage disk for testing
+
+    $size = (Constants::BOOK_COVER_MIN_RES + Constants::BOOK_COVER_MAX_RES) / 2;
+
+    //No cover
+    $this->actingAs($this->user)
+        ->post(route('books.store'), $this->getBookFormData(['cover' => null]))
+        ->assertStatus(302)
+        ->assertInvalid(['cover' => Lang::get('validation.required', ['attribute' => 'cover'])]);
+
+    //Too small
+    $this->actingAs($this->user)
+        ->post(route('books.store'), $this->getBookFormData(['cover' => UploadedFile::fake()->image('cover.jpg', Constants::BOOK_COVER_MIN_RES - 1, Constants::BOOK_COVER_MIN_RES - 1)->size(Constants::BOOK_COVER_MAX_WEIGHT / 2)]))
+        ->assertStatus(302)
+        ->assertInvalid(['cover' => Lang::get('validation.cover_dimensions')]);
+
+    //Too big
+    $this->actingAs($this->user)
+        ->post(route('books.store'), $this->getBookFormData(['cover' => UploadedFile::fake()->image('cover.jpg',  Constants::BOOK_COVER_MAX_RES + 1, Constants::BOOK_COVER_MAX_RES + 1)->size(Constants::BOOK_COVER_MAX_WEIGHT / 2)]))
+        ->assertStatus(302)
+        ->assertInvalid(['cover' => Lang::get('validation.cover_dimensions')]);
+
+    //Too heavy
+    $this->actingAs($this->user)
+        ->post(route('books.store'), $this->getBookFormData(['cover' => UploadedFile::fake()->image('cover.jpg', $size, $size)->size(Constants::BOOK_COVER_MAX_WEIGHT + 1)]))
+        ->assertStatus(302)
+        ->assertInvalid(['cover' => Lang::get('validation.max.file', ['attribute' => 'cover', 'max' => Constants::BOOK_COVER_MAX_WEIGHT])]);
+
+    //Not an image
+    $this->actingAs($this->user)
+        ->post(route('books.store'), $this->getBookFormData(['cover' => UploadedFile::fake()->create('cover.pdf', Constants::BOOK_COVER_MAX_WEIGHT / 2)]))
+        ->assertStatus(302)
+        ->assertInvalid(['cover' => Lang::get('validation.image', ['attribute' => 'cover'])]);
+
+    //Wrong type
+    $this->actingAs($this->user)
+        ->post(route('books.store'), $this->getBookFormData(['cover' => UploadedFile::fake()->image('cover.gif', $size, $size)->size(Constants::BOOK_COVER_MAX_WEIGHT / 2)]))
+        ->assertStatus(302)
+        ->assertInvalid(['cover' => Lang::get('validation.mimes', ['attribute' => 'cover', 'values' => implode(', ', Constants::IMAGE_EXTENSIONS_ALLOWED)])]);
+});
+
+test('book_delete_successfull', function () {
+    $book = $this->getBooks(count: 1, user: $this->user);
+
+    $this->actingAs($this->user)
+        ->delete(route('books.destroy', $book))
+        ->assertStatus(302)
+        ->assertRedirectToRoute('books.owner');
+
+    $this->assertDatabaseMissing('books', $book->toArray());
+});
+
+test('book_delete_auth', function () {
+    $book = $this->getBooks(count: 1);
+
+    $this->delete(route('books.destroy', $book))
+        ->assertStatus(302)
+        ->assertRedirect(route('login'));
+});
+
+test('book_delete_cant_be_accessed_by_others', function () {
+    $book = $this->getBooks(count: 1);
+
+    $this->actingAs($this->user)
+        ->delete(route('books.destroy', $book))
+        ->assertForbidden();
+});

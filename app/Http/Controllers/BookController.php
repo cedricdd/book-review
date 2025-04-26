@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants;
+use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use App\Models\Review;
 use Illuminate\Http\Request;
@@ -50,5 +51,48 @@ class BookController extends Controller
 
         // Return the view with the book
         return view('books.show', compact('book', 'reviews', 'rating', 'userReview'));
+    }
+
+    public function create()
+    {
+        if(url()->current() != url()->previous()) {
+            session()->put('url.back', url()->previous());
+        }
+
+        return view('books.create');
+    }
+
+    public function store(BookRequest $request)
+    {
+        $book = new Book();
+        $book->title = $request->input('title');
+        $book->summary = $request->input('summary');
+        $book->author = $request->input('author');
+        $book->published_at = $request->input('published_at');
+        $book->user()->associate(Auth::user());
+        $book->save();
+
+        if($request->hasFile('cover')) {
+            $cover = $request->file('cover');
+
+            $book->cover_image = $request->file('cover')->storeAs('covers',  $book->id . '.' . $cover->extension(), ['disk' => 'public']);
+            $book->save();
+        }
+
+        return redirect()->route('books.show', ['book' => $book])->with('success', 'Book created successfully!');
+    }
+
+    public function destroy(Book $book)
+    {
+        $book->delete();
+
+        return redirect()->route('books.owner')->with('success', 'Book deleted successfully!');
+    }
+
+    public function owner()
+    {
+        $books = Auth::user()->books()->latest()->get();
+
+        return view('books.owner', compact('books'));
     }
 }
