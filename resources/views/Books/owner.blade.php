@@ -9,7 +9,7 @@
 
         @if ($books->count())
             @foreach ($books as $book)
-                <x-books.card :book="$book" />
+                <x-books.card :$book :$ratedBooks />
             @endforeach
         @else
             <p class="text-center text-4xl text-gray-500">No books added yet. Be the first one!</p>

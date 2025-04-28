@@ -25,6 +25,14 @@ class BookController extends Controller
             ->setSorting(session('book-sorting', Constants::BOOK_SORTING_DEFAULT))
             ->paginate(Constants::BOOKS_PER_PAGE);
 
+        $ratedBooks = collect();
+
+        if (Auth::check() && $books->count()) {
+            $ratedBooks = $request->user()->reviews()
+                ->whereIn('book_id', $books->pluck('id'))
+                ->pluck('rating', 'book_id');
+        }
+
         //Redirect to the last page if the requested page exceeds the last page
         if($request->input('page', 1) > $books->lastPage()) {
             return redirect()->route('books.index', ['page' => $books->lastPage()]); 
@@ -33,7 +41,7 @@ class BookController extends Controller
         if(!empty($term)) $books->appends(['q' => $term]);
 
         // Return the view with the books and the search query
-        return view('books.index', compact('books', 'term'));
+        return view('books.index', compact('books', 'term', 'ratedBooks'));
     }
 
     public function show(Book $book): View
@@ -93,9 +101,17 @@ class BookController extends Controller
 
     public function owner(Request $request): View
     {
-        $books = $request->user()->books()->latest()->get();
+        $books = $request->user()->books()->withCount('reviews')->withAvg('reviews', 'rating')->latest()->get();
 
-        return view('books.owner', compact('books'));
+        $ratedBooks = collect();
+
+        if (Auth::check() && $books->count()) {
+            $ratedBooks = $request->user()->reviews()
+                ->whereIn('book_id', $books->pluck('id'))
+                ->pluck('rating', 'book_id');
+        }
+
+        return view('books.owner', compact('books', 'ratedBooks'));
     }
 
     public function edit(Book $book): View|RedirectResponse

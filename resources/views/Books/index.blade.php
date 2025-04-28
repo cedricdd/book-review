@@ -12,7 +12,7 @@
 
         <div>
             @forelse($books as $book)
-                <x-books.card :$book />
+                <x-books.card :$book :$ratedBooks />
             @empty
                 @empty($term)
                     <p class="text-center text-4xl text-gray-500">No books available.</p>
