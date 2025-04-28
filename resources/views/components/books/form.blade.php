@@ -1,6 +1,6 @@
 @props(['action' => 'Edit', 'book' => null])
 
-<form action="{{ $action == 'Create' ? route('books.store') : route('books.edit', $book) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ $action == 'Create' ? route('books.store') : route('books.update', $book) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @if ($action == 'Edit')
         @method('PUT')
@@ -13,13 +13,21 @@
         <x-forms.input name='author' label='Author' value="{{ old('author', $book?->author) }}" />
     </div>
     <div class="mb-4">
-        <x-forms.input name="published_at" label="Published Date" type="date" value="{{ old('published_at', $book?->published_at) }}" />
+        <x-forms.input 
+            name="published_at" 
+            label="Published Date" 
+            type="date" 
+            value="{{ old('published_at', $book ? \Carbon\Carbon::parse($book->published_at)->format('Y-m-d') : null) }}"
+        />
     </div>
     <div class="mb-4">
         <x-forms.text name='summary' label='Summary' placeholder="Summary needs to be at least {{ Constants::BOOK_SUMMARY_MIN_LENGTH }} characters.">{{ old('summary', $book?->summary) }}</x-forms.text>
     </div>
     <div class="mb-4">
         <x-forms.input name="cover" label="Cover (Best 600*800 px)" type="file" />
+        @if($action == "Edit")
+            <span class="italic">* Not including a cover will not remove the existing one!</span>
+        @endif
     </div>
     <div class="flex gap-x-2 justify-between">
         <x-link-button href="{{ session('url.back', url()->previous()) }}">Cancel</x-link-button>

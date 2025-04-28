@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Constants;
-use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use App\Models\Review;
+use Illuminate\View\View;
 use Illuminate\Http\Request;
+use App\Http\Requests\BookRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 
 class BookController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): RedirectResponse|View
     {
         $term = trim(htmlspecialchars($request->input('q', '')));
 
@@ -34,7 +36,7 @@ class BookController extends Controller
         return view('books.index', compact('books', 'term'));
     }
 
-    public function show(Book $book)
+    public function show(Book $book): View
     {
         // Fetch the reviews and cache them for 24 hours
         $reviews = Cache::remember('book_reviews_' . $book->id, Constants::CACHE_REVIEWS, fn() => $book->reviews()->latest()->with('user')->get());
@@ -53,7 +55,7 @@ class BookController extends Controller
         return view('books.show', compact('book', 'reviews', 'rating', 'userReview'));
     }
 
-    public function create()
+    public function create(): View
     {
         if(url()->current() != url()->previous()) {
             session()->put('url.back', url()->previous());
@@ -62,7 +64,7 @@ class BookController extends Controller
         return view('books.create');
     }
 
-    public function store(BookRequest $request)
+    public function store(BookRequest $request): RedirectResponse
     {
         $book = new Book();
         $book->title = $request->input('title');
@@ -82,17 +84,26 @@ class BookController extends Controller
         return redirect()->route('books.show', ['book' => $book])->with('success', 'Book created successfully!');
     }
 
-    public function destroy(Book $book)
+    public function destroy(Book $book): RedirectResponse
     {
         $book->delete();
 
         return redirect()->route('books.owner')->with('success', 'Book deleted successfully!');
     }
 
-    public function owner()
+    public function owner(Request $request): View
     {
-        $books = Auth::user()->books()->latest()->get();
+        $books = $request->books()->latest()->get();
 
         return view('books.owner', compact('books'));
+    }
+
+    public function edit(Book $book): View|RedirectResponse
+    {   
+        if(url()->current() != url()->previous()) {
+            session()->put('url.back', url()->previous());
+        }
+
+        return view('books.edit', compact('book'));
     }
 }

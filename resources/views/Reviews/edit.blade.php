@@ -6,7 +6,7 @@
     <div>
         <div class="flex justify-center items-center gap-x-4">
             <div class="flex justify-center items-center w-[300px]">
-                <img src="{{ $book->cover_image }}" alt="{{ $book->title }}-cover" loading="lazy" class="rounded">
+                <img src="{{ $book->cover }}" alt="{{ $book->title }}-cover" loading="lazy" class="rounded">
             </div>
             <div class="items-center">
                 <h1 class="text-4xl font-bold mb-2">{{ $book->title }}</h1>

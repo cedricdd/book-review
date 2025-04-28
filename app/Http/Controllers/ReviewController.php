@@ -43,7 +43,7 @@ class ReviewController extends Controller
         return redirect()->to(session()->get('url.back', url()->previous()))->with('success', 'Review added successfully!');
     }
 
-    public function edit(Book $book, Review $review)
+    public function edit(Book $book, Review $review): View
     {
         if (url()->current() != url()->previous()) {
             session()->put('url.back', url()->previous());

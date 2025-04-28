@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Constants;
 use App\Models\User;
+use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
-    public function profile(Request $request, User $user)
+    public function profile(Request $request, User $user): RedirectResponse|View
     {
         $reviews = $user->reviews()->with('book')
             ->setSorting(session()->get('review-sorting', Constants::REVIEW_SORTING_DEFAULT))
@@ -27,7 +28,7 @@ class UserController extends Controller
         return view('users.profile', compact('user', 'reviews'));
     }
 
-    public function login(Request $request)
+    public function login(Request $request): View
     {
         if(url()->current() != url()->previous()) {
             session()->put('url.login', url()->previous());
@@ -36,7 +37,7 @@ class UserController extends Controller
         return view('users.login');
     }
 
-    public function loginPost(LoginRequest $request)
+    public function loginPost(LoginRequest $request): RedirectResponse
     {
         if(!RateLimiter::attempt(key: 'login' . $request->ip(), maxAttempts: 5, callback: function() {})) {
             throw ValidationException::withMessages([

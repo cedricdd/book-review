@@ -24,13 +24,7 @@
         <p class="p-4 rounded my-4 border border-2 border-white/25">Summary: {{ $book->summary }}</p>
 
         <div class="flex gap-x-2 justify-center items-center">
-            @if ($userReview)
-                <div>
-                    <p class="text-2xl font-bold mb-4">Your Review</p>
-
-                    <x-reviews.card :review="$userReview" />
-                </div>
-            @elseif(Auth::check())
+            @if (Auth::check() && !$userReview)
                 <div class="flex justify-center">
                     <x-link-button color='blue' size='big' href="{{ route('reviews.create', $book->id) }}">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -45,7 +39,16 @@
                 </div>
             @endif
 
-            @if ($book->user()->is(auth()->user()))
+            @can('update', $book)
+                <div class="flex justify-center">
+                    <x-link-button color='blue' href="{{ route('books.edit', $book) }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.75 -0.75 24 24" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" id="Edit--Streamline-Tabler" height="24" width="24"><desc>Edit Streamline Icon: https://streamlinehq.com</desc><path d="M6.5625 6.5625H5.625a1.875 1.875 0 0 0 -1.875 1.875v8.4375a1.875 1.875 0 0 0 1.875 1.875h8.4375a1.875 1.875 0 0 0 1.875 -1.875v-0.9375" stroke-width="1.5"></path><path d="M19.110937500000002 6.1734375a1.96875 1.96875 0 0 0 -2.7843750000000003 -2.7843750000000003L8.4375 11.25v2.8125h2.8125l7.8609374999999995 -7.8890625z" stroke-width="1.5"></path><path d="m15 4.6875 2.8125 2.8125" stroke-width="1.5"></path></svg>
+                        Edit Book
+                    </x-link-button>
+                </div>
+            @endcan
+
+            @can('destroy', $book)
                 <form action="{{ route('books.destroy', $book) }}" method="POST">
                     @csrf
                     @method('DELETE')
@@ -62,8 +65,16 @@
                         </x-forms.button>
                     </div>
                 </form>
-            @endif
+            @endcan
         </div>
+
+        @if ($userReview)
+            <div>
+                <p class="text-2xl font-bold mb-4">Your Review</p>
+
+                <x-reviews.card :review="$userReview" />
+            </div>
+        @endif
 
         <p class="text-2xl font-bold my-10">{{ $reviews->count() . ' ' . Str::plural('Review', $reviews->count()) }}</p>
 

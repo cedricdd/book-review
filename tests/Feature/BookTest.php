@@ -4,6 +4,7 @@ use App\Constants;
 use App\Models\Book;
 use Illuminate\Support\Arr;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
@@ -245,10 +246,33 @@ test('book_delete_auth', function () {
         ->assertRedirect(route('login'));
 });
 
-test('book_delete_cant_be_accessed_by_others', function () {
+test('book_delete_owner', function () {
     $book = $this->getBooks(count: 1);
 
+    $this->actingAs($this->user)->delete(route('books.destroy', $book))->assertForbidden();
+});
+
+test('book_edit', function () {
+    $book = $this->getBooks(count: 1, user: $this->user);
+
     $this->actingAs($this->user)
-        ->delete(route('books.destroy', $book))
-        ->assertForbidden();
+        ->get(route('books.edit', $book))
+        ->assertStatus(200)
+        ->assertViewIs('books.edit')
+        ->assertViewHas('book', fn($viewBook) => $viewBook->is($book))
+        ->assertSee(['Title', $book->title, 'Author', $book->author, 'Published Date', Carbon::parse($book->published_at)->format('Y-m-d'), 'Summary', $book->summary, 'Cover', 'Edit']);
+});
+
+test('book_edit_auth', function () {
+    $book = $this->getBooks(count: 1);
+
+    $this->get(route('books.edit', $book))
+        ->assertStatus(302)
+        ->assertRedirect(route('login'));
+});
+
+test('book_edit_owner', function () {
+    $book = $this->getBooks(count: 1);
+
+    $this->actingAs($this->user)->get(route('books.edit', $book))->assertForbidden();;
 });

@@ -10,6 +10,8 @@ Route::get('/', [BookController::class, 'index'])->name('books.index');
 Route::get('books/create', [BookController::class, 'create'])->name('books.create')->middleware('auth');
 Route::post('books', [BookController::class, 'store'])->name('books.store')->middleware('auth');
 Route::get('books/owner', [BookController::class, 'owner'])->name('books.owner')->middleware('auth');
+Route::get('books/edit/{book}', [BookController::class, 'edit'])->name('books.edit')->middleware('auth')->can('update', 'book');
+Route::put('books/{book}', [BookController::class, 'update'])->name('books.update')->middleware('auth')->can('update', 'book');
 Route::get('books/{book}', [BookController::class, 'show'])->name('books.show');
 Route::delete('books/{book}', [BookController::class, 'destroy'])->name('books.destroy')->middleware('auth')->can('destroy', 'book');
 

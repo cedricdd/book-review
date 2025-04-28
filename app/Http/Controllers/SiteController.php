@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Constants;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class SiteController extends Controller
 {
-    public function sorting(Request $request, $type)
+    public function sorting(Request $request, $type): RedirectResponse
     {
         $sorting = $request->input('sorting', '');
 
