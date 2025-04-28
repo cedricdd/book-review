@@ -93,7 +93,7 @@ class BookController extends Controller
 
     public function owner(Request $request): View
     {
-        $books = $request->books()->latest()->get();
+        $books = $request->user()->books()->latest()->get();
 
         return view('books.owner', compact('books'));
     }
@@ -106,4 +106,22 @@ class BookController extends Controller
 
         return view('books.edit', compact('book'));
     }
+
+    public function update(BookRequest $request, Book $book): RedirectResponse
+    {
+        $book->title = $request->input('title');
+        $book->summary = $request->input('summary');
+        $book->author = $request->input('author');
+        $book->published_at = $request->input('published_at');
+
+        if($request->hasFile('cover')) {
+            $cover = $request->file('cover');
+
+            $book->cover_image = $request->file('cover')->storeAs('covers',  $book->id . '.' . $cover->extension(), ['disk' => 'public']);
+        }
+
+        $book->save();
+
+        return redirect()->route('books.show', ['book' => $book])->with('success', 'Book updated successfully!');
+    }   
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Constants;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Foundation\Http\FormRequest;
@@ -31,7 +32,7 @@ class BookRequest extends FormRequest
             'summary' => 'bail|required|string|min:' . Constants::BOOK_SUMMARY_MIN_LENGTH . '|max:' . Constants::BOOK_SUMMARY_MAX_LENGTH,
             'cover' => [
                 'bail', 
-                'required',
+                Rule::requiredIf($this->routeIs('books.store')),
                 'image',
                 'mimes:' . implode(',', Constants::IMAGE_EXTENSIONS_ALLOWED),
                 'max:' . Constants::BOOK_COVER_MAX_WEIGHT,

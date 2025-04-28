@@ -31,7 +31,7 @@ test('review_model_event_update_cache', function () {
     Cache::shouldHaveReceived('forget')->times(3)->with("book_reviews_{$book->id}");
 });
 
-test('review_delete_cant_be_accessed_by_others', function () {
+test('review_delete_owner', function () {
     $review = $this->getReviews(count: 1);
 
     $this->actingAs($this->user)
@@ -63,6 +63,7 @@ test('review_edit', function () {
 
     $this->actingAs($this->user)
         ->get(route('reviews.edit', [$book, $review]))
+        ->assertValid()
         ->assertStatus(200)
         ->assertViewIs('reviews.edit')
         ->assertViewHas('book', fn($viewBook) => $viewBook->is($book))
@@ -77,7 +78,7 @@ test('review_edit_auth', function () {
     $this->get(route('reviews.edit', [$book, $review]))->assertRedirectToRoute('login');
 });
 
-test('review_edit_cant_be_accessed_by_others', function () {
+test('review_edit_owner', function () {
     $book = $this->getBooks(count: 1);
     $review = $this->getReviews(count: 1, book: $book);
 
@@ -91,8 +92,8 @@ test('review_update_success', function () {
 
     $this->actingAs($review->user)
         ->put(route('reviews.update', [$review->book, $review]), $this->getReviewFormData())
-        ->assertStatus(302)
-        ->assertSessionHasNoErrors();
+        ->assertValid()
+        ->assertStatus(302);
 
     // Check if the review was updated
     $this->assertDatabaseHas('reviews', ['id' => $review->id] + $this->getReviewFormData());
@@ -105,7 +106,7 @@ test('review_update_auth', function () {
     $this->put(route('reviews.update', [$review->book, $review]), $this->getReviewFormData())->assertRedirectToRoute('login');
 });
 
-test('review_update_cant_be_accessed_by_others', function () {
+test('review_update_owner', function () {
     $review = $this->getReviews(count: 1);
 
     $this->actingAs($this->user)->get(route('reviews.edit', [$review->book, $review]))->assertForbidden();
@@ -170,8 +171,8 @@ test('review_store_success', function () {
 
     $this->actingAs($this->user)
         ->post(route('reviews.store', [$book]), $this->getReviewFormData())
-        ->assertStatus(302)
-        ->assertSessionHasNoErrors();
+        ->assertValid()
+        ->assertStatus(302);
 
     // Check if the review was created
     $this->assertDatabaseHas('reviews', ['user_id' => $this->user->id, 'book_id' => $book->id] + $this->getReviewFormData());

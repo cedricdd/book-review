@@ -67,8 +67,8 @@ test('login_cant_be_accessed_by_authenticated_user', function () {
 
 test('login_successful', function () {
     $this->post(route('login'), $this->getLoginFormData())
-        ->assertRedirectToRoute('users.profile', [$this->user->id])
-        ->assertSessionHasNoErrors();
+        ->assertValid()
+        ->assertRedirectToRoute('users.profile', [$this->user->id]);
 
     $this->assertAuthenticatedAs($this->user);
 });

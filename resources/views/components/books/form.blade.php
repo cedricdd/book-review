@@ -7,10 +7,10 @@
     @endif
 
     <div class="mb-4">
-        <x-forms.input name='title' label='Title' value="{{ old('title', $book?->title) }}" />
+        <x-forms.input name='title' label='Title' value="{{ old('title', $book?->title) }}" required />
     </div>
     <div class="mb-4">
-        <x-forms.input name='author' label='Author' value="{{ old('author', $book?->author) }}" />
+        <x-forms.input name='author' label='Author' value="{{ old('author', $book?->author) }}" required />
     </div>
     <div class="mb-4">
         <x-forms.input 
@@ -18,10 +18,11 @@
             label="Published Date" 
             type="date" 
             value="{{ old('published_at', $book ? \Carbon\Carbon::parse($book->published_at)->format('Y-m-d') : null) }}"
+            required
         />
     </div>
     <div class="mb-4">
-        <x-forms.text name='summary' label='Summary' placeholder="Summary needs to be at least {{ Constants::BOOK_SUMMARY_MIN_LENGTH }} characters.">{{ old('summary', $book?->summary) }}</x-forms.text>
+        <x-forms.text name='summary' label='Summary' required placeholder="Summary needs to be at least {{ Constants::BOOK_SUMMARY_MIN_LENGTH }} characters.">{{ old('summary', $book?->summary) }}</x-forms.text>
     </div>
     <div class="mb-4">
         <x-forms.input name="cover" label="Cover (Best 600*800 px)" type="file" />

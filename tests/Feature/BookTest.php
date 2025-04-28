@@ -130,6 +130,24 @@ test('books_show_user_review', function () {
         ->assertViewHas('reviews', fn($reviews) => $reviews->count() === 10);
 });
 
+test('books_show_book_options', function () {
+    $book = $this->getBooks(count: 1, user: $this->user);
+
+    $this->actingAs($this->user)
+        ->get(route('books.show', $book))
+        ->assertStatus(200)
+        ->assertSeeTextInOrder(['Edit Book', 'Delete Book']);
+});
+
+test('books_show_hide_book_options', function () {
+    $book = $this->getBooks(count: 1);
+
+    $this->actingAs($this->user)
+        ->get(route('books.show', $book))
+        ->assertStatus(200)
+        ->assertDontSeeText(['Edit Book', 'Delete Book']);
+});
+
 test('book_create_auth', function () {
     $this->get(route('books.create'))
         ->assertStatus(302)
@@ -151,6 +169,7 @@ test('book_store_successfull', function () {
 
     $this->actingAs($this->user)
         ->post(route('books.store'), $data)
+        ->assertValid()
         ->assertStatus(302)
         ->assertRedirectToRoute('books.show', 1)
         ->assertSessionHas('success');
@@ -266,13 +285,57 @@ test('book_edit', function () {
 test('book_edit_auth', function () {
     $book = $this->getBooks(count: 1);
 
-    $this->get(route('books.edit', $book))
-        ->assertStatus(302)
-        ->assertRedirect(route('login'));
+    $this->get(route('books.edit', $book))->assertStatus(302)->assertRedirect(route('login'));
 });
 
 test('book_edit_owner', function () {
     $book = $this->getBooks(count: 1);
 
     $this->actingAs($this->user)->get(route('books.edit', $book))->assertForbidden();;
+});
+
+test('book_update_successfull', function () {
+    $book = $this->getBooks(count: 1, user: $this->user);
+
+    Storage::fake('public');
+
+    $data = $this->getBookFormData();
+
+    $this->actingAs($this->user)
+        ->put(route('books.update', $book), $data)
+        ->assertValid()
+        ->assertStatus(302)
+        ->assertRedirectToRoute('books.show', $book)
+        ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('books', Arr::except($data, 'cover'));
+
+    //Check if the cover was uploaded
+    Storage::assertExists(Book::find(1)->first()->cover_image);
+});
+
+test('book_update_cover_optional', function () {
+    $book = $this->getBooks(count: 1, user: $this->user);
+
+    Storage::fake('public'); // Create a fake storage disk for testing
+
+    $this->actingAs($this->user)
+        ->put(route('books.update', $book), Arr::except($this->getBookFormData(), 'cover'))
+        ->assertValid()
+        ->assertStatus(302)
+        ->assertRedirectToRoute('books.show', $book);
+
+    expect($book->cover_image)->toBe(Book::find($book->id)->cover_image); //Logo info should not change
+});
+
+test('book_update_auth', function () {
+    $book = $this->getBooks(count: 1);
+
+    $this->put(route('books.update', $book), $this->getBookFormData())->assertStatus(302)->assertRedirect(route('login'));
+});
+
+test('book_update_owner', function () {
+    $book = $this->getBooks(count: 1);
+
+    $this->actingAs($this->user)->put(route('books.update', $book), $this->getBookFormData())->assertForbidden();;
 });
