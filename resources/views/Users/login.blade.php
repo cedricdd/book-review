@@ -12,7 +12,7 @@
             <x-forms.input name="password" label="Password" type="password" required />
         </div>
         <div class="flex justify-between gap-x-2">
-            <x-link-button href="/">Cancel</x-link-button>
+            <x-link-button href="{{ session('url.login', url()->previous()) }}">Cancel</x-link-button>
             <x-forms.button color='blue'>Login</x-forms.button>
         </div>
     </form>

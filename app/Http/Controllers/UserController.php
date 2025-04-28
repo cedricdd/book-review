@@ -29,6 +29,10 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        if(url()->current() != url()->previous()) {
+            session()->put('url.login', url()->previous());
+        }
+
         return view('users.login');
     }
 
@@ -50,7 +54,7 @@ class UserController extends Controller
 
         Session::regenerate();
 
-        return redirect()->route("users.profile", Auth::user()->id)->with("success", "You have been successfully logged in!");
+        return redirect()->to(session('url.login', route('users.profile', Auth::user())))->with("success", "You have been successfully logged in!");
     }
 
     public function logout(): RedirectResponse {
