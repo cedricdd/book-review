@@ -19,7 +19,9 @@
                 <x-nav-link name='books.index'>Books</x-nav-link>
                 @auth()
                     <x-nav-link name='books.create'>Add Book</x-nav-link>
-                    <x-nav-link name='books.owner'>Your Book</x-nav-link>
+                    @if(($book_count = Auth::user()->books()->count()))
+                    <x-nav-link name='books.owner'>Your Books ({{ $book_count }})</x-nav-link>
+                    @endif
                 @endauth
             </div>
             <div class="flex items-center gap-1">

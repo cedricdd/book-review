@@ -4,7 +4,7 @@ use App\Constants;
 use App\Models\Review;
 use Illuminate\Support\Facades\Cache;
 
-test('review_model_event_update_cache', function() {
+test('review_model_event_update_cache', function () {
     Cache::spy();
 
     $book = $this->getBooks(1);
@@ -31,36 +31,36 @@ test('review_model_event_update_cache', function() {
     Cache::shouldHaveReceived('forget')->times(3)->with("book_reviews_{$book->id}");
 });
 
-test('review_delete_cant_be_accessed_by_others', function() {
+test('review_delete_cant_be_accessed_by_others', function () {
     $review = $this->getReviews(count: 1);
-    
+
     $this->actingAs($this->user)
         ->delete(route('reviews.destroy', $review->id))
         ->assertForbidden();
 });
 
-test('review_delete_auth', function() {
+test('review_delete_auth', function () {
     $review = $this->getReviews(count: 1);
-    
+
     $this->delete(route('reviews.destroy', $review->id))->assertRedirectToRoute('login');
 });
 
-test('review_delete', function() {
+test('review_delete', function () {
     $review = $this->getReviews(count: 1, user: $this->user);
-    
+
     $this->actingAs($review->user)
         ->delete(route('reviews.destroy', $review->id))
         ->assertStatus(302)
         ->assertSessionHasNoErrors();
-    
+
     // Check if the review was deleted
     $this->assertDatabaseMissing('reviews', ['id' => $review->id]);
 });
 
-test('review_edit', function() {
+test('review_edit', function () {
     $book = $this->getBooks(count: 1);
     $review = $this->getReviews(count: 1, book: $book, user: $this->user);
-    
+
     $this->actingAs($this->user)
         ->get(route('reviews.edit', [$book, $review]))
         ->assertStatus(200)
@@ -70,54 +70,54 @@ test('review_edit', function() {
         ->assertSeeTextInOrder(['Review', 'Rating', 'Edit']);
 });
 
-test('review_edit_auth', function() {
+test('review_edit_auth', function () {
     $book = $this->getBooks(count: 1);
     $review = $this->getReviews(count: 1, book: $book, user: $this->user);
-    
+
     $this->get(route('reviews.edit', [$book, $review]))->assertRedirectToRoute('login');
 });
 
-test('review_edit_cant_be_accessed_by_others', function() {
+test('review_edit_cant_be_accessed_by_others', function () {
     $book = $this->getBooks(count: 1);
     $review = $this->getReviews(count: 1, book: $book);
-    
+
     $this->actingAs($this->user)
         ->get(route('reviews.edit', [$book, $review]))
         ->assertForbidden();
 });
 
-test('review_update_success', function() {
+test('review_update_success', function () {
     $review = $this->getReviews(count: 1, user: $this->user);
-    
+
     $this->actingAs($review->user)
         ->put(route('reviews.update', [$review->book, $review]), $this->getReviewFormData())
         ->assertStatus(302)
         ->assertSessionHasNoErrors();
-    
+
     // Check if the review was updated
     $this->assertDatabaseHas('reviews', ['id' => $review->id] + $this->getReviewFormData());
 });
 
-test('review_update_auth', function() {
+test('review_update_auth', function () {
     $book = $this->getBooks(count: 1);
     $review = $this->getReviews(count: 1, book: $book);
-    
+
     $this->put(route('reviews.update', [$review->book, $review]), $this->getReviewFormData())->assertRedirectToRoute('login');
 });
 
-test('review_update_cant_be_accessed_by_others', function() {
+test('review_update_cant_be_accessed_by_others', function () {
     $review = $this->getReviews(count: 1);
 
     $this->actingAs($this->user)->get(route('reviews.edit', [$review->book, $review]))->assertForbidden();
-    
+
     $this->actingAs($this->user)
         ->put(route('reviews.update', [$review->book, $review]), $this->getReviewFormData())
         ->assertForbidden();
 });
 
-test('review_form_validation', function() {
+test('review_form_validation', function () {
     $book = $this->getBooks(count: 1);
-    
+
     $this->checkForm(
         route('reviews.store', [$book]),
         $this->getReviewFormData(),
@@ -133,9 +133,9 @@ test('review_form_validation', function() {
     );
 });
 
-test('review_create', function() {
+test('review_create', function () {
     $book = $this->getBooks(count: 1);
-    
+
     $this->actingAs($this->user)
         ->get(route('reviews.create', [$book]))
         ->assertStatus(200)
@@ -144,44 +144,49 @@ test('review_create', function() {
         ->assertSeeTextInOrder(['Review', 'Rating', 'Create']);
 });
 
-test('review_create_auth', function() {
+test('review_create_auth', function () {
     $book = $this->getBooks(count: 1);
-    
+
     $this->get(route('reviews.create', [$book]))->assertRedirectToRoute('login');
 });
 
-test('review_create_duplicate', function() {
+test('review_duplicate', function () {
     $book = $this->getBooks(count: 1);
     $this->getReviews(count: 1, book: $book, user: $this->user);
-    
+
     $this->actingAs($this->user)
         ->get(route('reviews.create', [$book]))
         ->assertStatus(302)
         ->assertSessionHas('failure', 'You have already reviewed this book!');
+
+    $this->actingAs($this->user)
+        ->post(route('reviews.store', [$book]), $this->getReviewFormData())
+        ->assertStatus(302)
+        ->assertSessionHas('failure', 'You have already reviewed this book!');
 });
 
-test('review_store_success', function() {
+test('review_store_success', function () {
     $book = $this->getBooks(count: 1);
-    
+
     $this->actingAs($this->user)
         ->post(route('reviews.store', [$book]), $this->getReviewFormData())
         ->assertStatus(302)
         ->assertSessionHasNoErrors();
-    
+
     // Check if the review was created
     $this->assertDatabaseHas('reviews', ['user_id' => $this->user->id, 'book_id' => $book->id] + $this->getReviewFormData());
 });
 
-test('review_store_auth', function() {
+test('review_store_auth', function () {
     $book = $this->getBooks(count: 1);
-    
+
     $this->post(route('reviews.store', [$book]), $this->getReviewFormData())->assertRedirectToRoute('login');
 });
 
-test('review_store_duplicate', function() {
+test('review_store_duplicate', function () {
     $book = $this->getBooks(count: 1);
     $this->getReviews(count: 1, book: $book, user: $this->user);
-    
+
     $this->actingAs($this->user)
         ->post(route('reviews.store', [$book]), $this->getReviewFormData())
         ->assertStatus(302)

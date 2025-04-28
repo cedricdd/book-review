@@ -14,11 +14,12 @@ class ReviewController extends Controller
 {
     public function create(Book $book): View|RedirectResponse
     {
-        if(url()->current() != url()->previous()) {
+        if (url()->current() != url()->previous()) {
             session()->put('url.back', url()->previous());
         }
 
-        if(Review::where('book_id', $book->id)->where('user_id', Auth::id())->exists()) {
+        // Check if the user has already reviewed the book
+        if ($book->reviews()->where('user_id', Auth::id())->exists()) {
             return redirect()->back()->with('failure', 'You have already reviewed this book!');
         }
 
@@ -27,7 +28,8 @@ class ReviewController extends Controller
 
     public function store(ReviewRequest $request, Book $book): RedirectResponse
     {
-        if(Review::where('book_id', $book->id)->where('user_id', Auth::id())->exists()) {
+        // Check if the user has already reviewed the book
+        if ($book->reviews()->where('user_id', Auth::id())->exists()) {
             return redirect()->back()->with('failure', 'You have already reviewed this book!');
         }
 
@@ -43,7 +45,7 @@ class ReviewController extends Controller
 
     public function edit(Book $book, Review $review)
     {
-        if(url()->current() != url()->previous()) {
+        if (url()->current() != url()->previous()) {
             session()->put('url.back', url()->previous());
         }
 
