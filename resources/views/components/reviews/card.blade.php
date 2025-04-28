@@ -1,5 +1,5 @@
 <div class="bg-white/10 rounded-lg p-4 mb-4 shadow-md hover:shadow-lg hover:bg-white/15 border-1 border-transparent hover:border-blue-500 transition duration-300 p-4 shadow/20 shadow-white">
-    <div class="flex justify-between">
+    <div class="flex justify-between items-center">
         <x-star-rating :rating="$review->rating" />
         <p class="text-gray-400 mt-1">{{ $review->created_at->diffForHumans() }}</p>
     </div>

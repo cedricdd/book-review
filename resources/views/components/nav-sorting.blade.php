@@ -10,12 +10,12 @@
     } 
 @endphp
 
-<div class="my-4 p-6 bg-white/10 rounded">
+<div class="my-4 p-4 bg-white/10 rounded">
     <p class="text-center text-3xl mb-4">Order By:</p>
     <form action="{{ route('sorting', $type) }}" method="POST" class="flex justify-center items-center flex-wrap gap-2">
         @csrf
         @foreach ($elements as $name => $sorting)
-            <x-forms.button name="sorting" value="{{ $name }}">
+            <x-forms.button name="sorting" value="{{ $name }}" class="justify-between!">
                 @if ($session == $name)
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">

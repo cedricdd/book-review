@@ -1,10 +1,10 @@
 @props(['book', 'ratedBooks' => collect()])
 
 <div
-    class="group bg-white/10 rounded-lg p-4 mb-4 shadow-md hover:shadow-lg hover:bg-white/15 border-1 border-transparent hover:border-blue-500 transition duration-300 flex gap-x-2 justify-between items-center p-4">
+    class="group bg-white/10 rounded-lg p-4 mb-4 shadow-md hover:shadow-lg hover:bg-white/15 border-1 border-transparent hover:border-blue-500 transition duration-300 flex flex-col sm:flex-row gap-x-2 gap-y-4 justify-between items-center p-4">
     <a href={{ route('books.show', $book->id) }}>
         <img src="{{ $book->cover }}" alt="{{ $book->title }}-cover" loading="lazy"
-            class="w-20 h-28 object-cover rounded-md mr-4">
+            class="w-40 sm:w-30 object-cover rounded-md mr-4">
     </a>
     <div class="flex-1">
         <a href={{ route('books.show', $book->id) }} class="text-2xl group-hover:text-blue-500">{{ $book->title }}</a>

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-4">
-        <div class="flex justify-center items-center gap-x-4">
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
             <div class="flex justify-center items-center w-[300px]">
                 <img src="{{ $book->cover }}" alt="{{ $book->title }}-cover" loading="lazy" class="rounded">
             </div>
@@ -23,7 +23,7 @@
         </div>
         <p class="p-4 rounded my-4 border border-2 border-white/25">Summary: {{ $book->summary }}</p>
 
-        <div class="flex gap-x-2 justify-center items-center">
+        <div class="flex gap-2 justify-center items-center flex-wrap mb-6">
             @if (Auth::check() && !$userReview)
                 <div class="flex justify-center">
                     <x-link-button color='blue' size='big' href="{{ route('reviews.create', $book->id) }}">
@@ -42,7 +42,18 @@
             @can('update', $book)
                 <div class="flex justify-center">
                     <x-link-button color='green' href="{{ route('books.edit', $book) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.75 -0.75 24 24" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" id="Edit--Streamline-Tabler" height="24" width="24"><desc>Edit Streamline Icon: https://streamlinehq.com</desc><path d="M6.5625 6.5625H5.625a1.875 1.875 0 0 0 -1.875 1.875v8.4375a1.875 1.875 0 0 0 1.875 1.875h8.4375a1.875 1.875 0 0 0 1.875 -1.875v-0.9375" stroke-width="1.5"></path><path d="M19.110937500000002 6.1734375a1.96875 1.96875 0 0 0 -2.7843750000000003 -2.7843750000000003L8.4375 11.25v2.8125h2.8125l7.8609374999999995 -7.8890625z" stroke-width="1.5"></path><path d="m15 4.6875 2.8125 2.8125" stroke-width="1.5"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.75 -0.75 24 24" fill="none" stroke="#FFFFFF"
+                            stroke-linecap="round" stroke-linejoin="round" id="Edit--Streamline-Tabler" height="24"
+                            width="24">
+                            <desc>Edit Streamline Icon: https://streamlinehq.com</desc>
+                            <path
+                                d="M6.5625 6.5625H5.625a1.875 1.875 0 0 0 -1.875 1.875v8.4375a1.875 1.875 0 0 0 1.875 1.875h8.4375a1.875 1.875 0 0 0 1.875 -1.875v-0.9375"
+                                stroke-width="1.5"></path>
+                            <path
+                                d="M19.110937500000002 6.1734375a1.96875 1.96875 0 0 0 -2.7843750000000003 -2.7843750000000003L8.4375 11.25v2.8125h2.8125l7.8609374999999995 -7.8890625z"
+                                stroke-width="1.5"></path>
+                            <path d="m15 4.6875 2.8125 2.8125" stroke-width="1.5"></path>
+                        </svg>
                         Edit Book
                     </x-link-button>
                 </div>
@@ -76,13 +87,16 @@
             </div>
         @endif
 
-        <p class="text-2xl font-bold my-10">{{ $reviews->count() . ' ' . Str::plural('Review', $reviews->count()) }}</p>
 
-        @forelse($reviews as $review)
-            <x-reviews.card :$review />
-        @empty
-            <p class="text-center text-4xl text-gray-500">No reviews yet. Be the first one!</p>
-        @endforelse
+        @if ($reviews->count())
+            <p class="text-2xl font-bold my-10">{{ $reviews->count() . ' ' . Str::plural('Review', $reviews->count()) }}</p>
+
+            @foreach ($reviews as $review)
+                <x-reviews.card :$review />
+            @endforeach
+        @elseif (!$userReview)
+            <p class="text-center text-4xl text-gray-500 mt-10">No reviews yet. Be the first one!</p>
+        @endif
     </div>
 
 @endsection
