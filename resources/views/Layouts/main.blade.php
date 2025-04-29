@@ -13,7 +13,7 @@
 
 <body class="min-h-full bg-dark text-white pb-20">
     <div>
-        <nav class="flex flex-col sm:flex-row justify-between items-center gap-2 border-b-2 border-white/25 py-2">
+        <nav class="flex flex-col sm:flex-row justify-between items-center gap-2 border-b-2 border-white/25 p-2">
             <a href="{{ route('books.index') }}">
                 <img loading="lazy" style="width:50px;" src="{{ Vite::asset('resources/images/logo.jpg') }}"
                     alt="logo" />

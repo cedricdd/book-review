@@ -5,7 +5,10 @@ namespace Database\Seeders;
 use App\Models\Book;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
+use App\Models\Author;
 use App\Models\Review;
+use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,16 +18,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        define('BOOK_COUNT', 500);
-        define('USER_COUNT', 150);
+        define('USER_COUNT', 250);
+        define('AUTHOR_COUNT', 250);
 
-        $books = Book::factory()->count(BOOK_COUNT)->create();
+        $authors = Author::factory()->count(AUTHOR_COUNT)->create()->each(function ($author)  {
+            //Add some books for each author
+            $author->books()->saveMany(Book::factory()->count(random_int(1, 10))->make());
+        });
 
-        //Generic books & reviews
+        $books = Book::select('id')->get();
+
+        //Generic reviews
         for ($i = 0; $i < USER_COUNT; $i++) {
             $user = User::factory()->create();
 
-            foreach ($books->shuffle()->slice(0, random_int(5, 25)) as $book) {
+            foreach ($books->shuffle()->slice(0, random_int(5, 30)) as $book) {
                 Review::factory()->for($book, 'book')->for($user, 'user')->create();
             }
         }
@@ -33,14 +41,14 @@ class DatabaseSeeder extends Seeder
 
         //Books with good reviews
         Book::factory()->count(20)->create()->each(function ($book) use ($users) {
-            foreach ($users->shuffle()->slice(0, random_int(8, 16)) as $user) {
+            foreach ($users->shuffle()->slice(0, random_int(10, 20)) as $user) {
                 Review::factory()->goodBook()->for($book, 'book')->for($user, 'user')->create();
             }
         });
 
         //Books with bad reviews
         Book::factory()->count(20)->create()->each(function ($book) use ($users) {
-            foreach ($users->shuffle()->slice(0, random_int(8, 16)) as $user) {
+            foreach ($users->shuffle()->slice(0, random_int(10, 20)) as $user) {
                 Review::factory()->badBook()->for($book, 'book')->for($user, 'user')->create();
             }
         });
@@ -48,8 +56,46 @@ class DatabaseSeeder extends Seeder
         //Our user's books & reviews
         $johnDoe = User::factory()->johnDoe()->create();
 
-        foreach ($books->shuffle()->slice(0, random_int(10, 20)) as $book) {
+        foreach ($books->shuffle()->slice(0, 20) as $book) {
             Review::factory()->for($book, 'book')->for($johnDoe, 'user')->create();
+        }
+
+        $categories = [
+            'Romance',
+            'Drama',
+            'Science Fiction',
+            'Fantasy',
+            'Mystery',
+            'Thriller',
+            'Horror',
+            'Historical',
+            'Biography',
+            'Self-Help',
+            'Non-Fiction',
+            'Young Adult',
+            'Children',
+            'Adventure',
+            'Classic',
+            'Poetry',
+            'Graphic Novel',
+            'Memoir',
+            'Crime',
+            'Dystopian'
+        ];
+
+        foreach ($categories as $name) {
+            $category = new Category();
+            $category->name = $name;
+            $category->slug = Str::slug($name);
+            $category->save();
+        }
+
+        $categoryIDs = range(1, count($categories));
+
+        foreach(Book::select('id')->get() as $book) {
+            shuffle($categoryIDs);
+
+            $book->categories()->attach(array_slice($categoryIDs, 0, random_int(1, 5)));
         }
     }
 }
