@@ -19,7 +19,8 @@ class BookController extends Controller
         $term = trim(htmlspecialchars($request->input('q', '')));
 
         // Fetch books from the database, applying the search filter if provided
-        $books = Book::withCount('reviews')
+        $books = Book::with('author')
+            ->withCount('reviews')
             ->withAvg('reviews', 'rating')
             ->when($term, fn($query) => $query->where('title', 'LIKE', "%{$term}%"))
             ->setSorting(session('book-sorting', Constants::BOOK_SORTING_DEFAULT))

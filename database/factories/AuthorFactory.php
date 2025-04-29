@@ -20,7 +20,7 @@ class AuthorFactory extends Factory
             'name' => fake()->name,
             'biography' => fake()->text(500),
             'date_of_birth' => fake()->date(max: '-20 years'),
-            'nationality' => fake()->country,
+            'country' => fake()->country,
             'website' => fake()->url,
         ];
     }

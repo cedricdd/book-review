@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\SiteController;
@@ -20,6 +21,9 @@ Route::post('books/{book}/reviews', [ReviewController::class, 'store'])->name('r
 Route::get('books/{book}/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit')->middleware('auth')->can('update', 'review');
 Route::put('books/{book}/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update')->middleware('auth')->can('update', 'review');
 Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy')->middleware('auth')->can('destroy', 'review');
+
+Route::get('authors', [AuthorController::class, 'index'])->name('authors.index');
+Route::get('authors/{author}', [AuthorController::class, 'show'])->name('authors.show');
 
 Route::post('sorting/{type}', [SiteController::class, 'sorting'])->name('sorting')->where('type', '[a-z]+');
 

@@ -7,6 +7,9 @@
     } elseif($type == 'review') {
         $elements = Constants::REVIEW_SORTING;
         $session = Session::get('review-sorting', Constants::REVIEW_SORTING_DEFAULT);
+    } elseif($type == 'author') {
+        $elements = Constants::AUTHOR_SORTING;
+        $session = Session::get('author-sorting', Constants::AUTHOR_SORTING_DEFAULT);
     } 
 @endphp
 

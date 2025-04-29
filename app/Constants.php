@@ -6,6 +6,7 @@ class Constants
 {
     const BOOKS_PER_PAGE = 20;
     const REVIEW_PER_PAGE = 20;
+    const AUTHOR_PER_PAGE = 10;
     const BOOK_SORTING = [
         'title' => 'Title',
         'newest' => 'Newest',
@@ -25,6 +26,13 @@ class Constants
         'lowest_rated' => 'Lowest Rated',
     ];
     const REVIEW_SORTING_DEFAULT = 'newest';
+    const AUTHOR_SORTING = [
+        'name' => 'Name',
+        'newest' => 'Newest',
+        'country' => 'Country',
+        'book_count' => 'Book Count',
+    ];
+    const AUTHOR_SORTING_DEFAULT = 'name';
     const REVIEW_MIN_LENGTH = 10;
     const REVIEW_MAX_LENGTH = 2048;
     const REVIEW_MIN_RATING = 0;

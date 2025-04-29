@@ -18,14 +18,15 @@
                 <img loading="lazy" style="width:50px;" src="{{ Vite::asset('resources/images/logo.jpg') }}"
                     alt="logo" />
             </a>
-            @auth
-                <div>
+            <div>
+                <x-nav-link name='authors.index'>Authors</x-nav-link>
+                @auth
                     <x-nav-link name='books.create'>Add Book</x-nav-link>
                     @if ($book_count = Auth::user()->books()->count())
                         <x-nav-link name='books.owner'>Your Books ({{ $book_count }})</x-nav-link>
                     @endif
-                </div>
-            @endauth
+                @endauth
+            </div>
             <div class="flex items-center gap-1">
                 @auth
                     <x-nav-link name='users.profile' :parameters="Auth::user()->id">Profile</x-nav-link>

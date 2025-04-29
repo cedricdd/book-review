@@ -26,6 +26,13 @@ class SiteController extends Controller
             } else {
                 session()->put('review-sorting', $sorting);
             }
+        } elseif ($type == 'author') {
+            //Invalid sorting, reset to default
+            if (!isset(Constants::AUTHOR_SORTING[$sorting])) {
+                session()->forget('author-sorting');
+            } else {
+                session()->put('author-sorting', $sorting);
+            }
         } else
             abort(404);
 

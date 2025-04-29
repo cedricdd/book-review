@@ -22,8 +22,7 @@ class DatabaseSeeder extends Seeder
         define('AUTHOR_COUNT', 250);
 
         $authors = Author::factory()->count(AUTHOR_COUNT)->create()->each(function ($author)  {
-            //Add some books for each author
-            $author->books()->saveMany(Book::factory()->count(random_int(1, 10))->make());
+            Book::factory()->count(random_int(1, 10))->for($author, 'author')->create();
         });
 
         $books = Book::select('id')->get();
