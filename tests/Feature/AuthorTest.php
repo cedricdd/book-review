@@ -35,7 +35,7 @@ test('authors_index_pagination', function () {
 });
 
 test('authors_index_sorting', function () {
-    $a = $this->getAuthors(count: Constants::AUTHOR_PER_PAGE * 2 - 1, createBooks: true);   // One author is automatically created for each test
+    $this->getAuthors(count: Constants::AUTHOR_PER_PAGE * 2 - 1, createBooks: true);   // One author is automatically created for each test
 
     foreach (Constants::AUTHOR_SORTING as $key => $value) {
         $authors = Author::setSorting($key)->get();
@@ -56,4 +56,24 @@ test("authors_index_last_page", function () {
         ->assertRedirect(route('authors.index', ['page' => $lastPage]));
 
     $this->get(route('authors.index', ['page' => $lastPage]))->assertStatus(200);
+});
+
+
+test('authors_show', function () {
+    $books = $this->getBooks(count: Constants::BOOKS_PER_PAGE, author: $this->author); 
+
+    $this->get(route('authors.show', $this->author))
+        ->assertStatus(200)
+        ->assertViewIs('authors.show')
+        ->assertViewHas('author', fn ($viewAuthor) => $viewAuthor->is($this->author))
+        ->assertSeeText([$this->author->name, $this->author->biography, $books->first()->title, $books->last()->title])
+        ->assertViewHas('books', fn ($viewBooks) => $viewBooks->count() === Constants::BOOKS_PER_PAGE)
+        ->assertSee([route('books.show', $books->first()), route('books.show', $books->last())]);
+
+    //Add a review to the first book
+    $review = $this->getReviews(count: 1, book: $books->first(), user: $this->user);
+
+    $this->actingAs($this->user)
+        ->get(route('authors.show', $this->author))
+        ->assertSeeText('Your Rating: ' . $review->rating);
 });

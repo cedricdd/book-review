@@ -8,9 +8,7 @@
         <p class="mb-4">Here are the books you have added.</p>
 
         @if ($books->count())
-            @foreach ($books as $book)
-                <x-books.card :$book :$ratedBooks />
-            @endforeach
+            <x-books.list :$books />
         @else
             <p class="text-center text-4xl text-gray-500">No books added yet. Be the first one!</p>
         @endif

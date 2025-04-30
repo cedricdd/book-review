@@ -10,7 +10,7 @@
             <p><b>Birthdate:</b> {{ $author->date_of_birth }}</p>
             <p><b>Country:</b> {{ $author->country }}</p>
         </div>
-        <div>
+        <div class="text-justify"">
             {{ $author->biography }}
         </div>
         <div>

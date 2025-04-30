@@ -10,7 +10,7 @@
             </div>
             <div class="items-center">
                 <h1 class="text-4xl font-bold mb-2">{{ $book->title }}</h1>
-                <h2 class="text-xl font-bold mb-2">by {{ $book->author->name }}</h2>
+                <h2 class="text-xl font-bold mb-2">by <a class="hover:text-blue-500" href="{{ route('authors.show', $book->author) }}">{{ $book->author->name }}</a></h2>
                 <p>Publish: {{ \Carbon\Carbon::parse($book->published_at)->format('Y-m-d') }}</p>
 
                 @if ($reviews->count())

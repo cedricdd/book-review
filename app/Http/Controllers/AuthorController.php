@@ -6,6 +6,7 @@ use App\Constants;
 use App\Models\Author;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 
 class AuthorController extends Controller
@@ -24,5 +25,16 @@ class AuthorController extends Controller
 
         // Return the view with the authors
         return view('authors.index', compact('authors'));
+    }
+
+    public function show(Request $request, Author $author): View
+    {
+        // Fetch the books for the author
+        $books = $author->books()->withCount('reviews')->withAvg('reviews', 'rating')->latest()->get();
+
+        foreach($books as $book) $book->setRelation('author', $author);
+
+        // Return the view with the author and their books
+        return view('authors.show', compact('author', 'books'));
     }
 }

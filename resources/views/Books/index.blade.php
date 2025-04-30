@@ -10,9 +10,9 @@
     <x-nav-sorting type="book" />
 
     <div>
-        @forelse($books as $book)
-            <x-books.card :$book :$ratedBooks />
-        @empty
+        @if($books->count())
+            <x-books.list :$books />
+        @else
             @empty($term)
                 <p class="text-center text-4xl text-gray-500">No books available.</p>
             @else
