@@ -195,6 +195,7 @@ return [
 
     'attributes' => [
         'published_at' => 'published date',
+        'author_id' => 'author',
     ],
 
 ];

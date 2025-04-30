@@ -15,12 +15,14 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     protected User $user;
+    protected Author $author;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->user = User::factory()->create();
+        $this->author = Author::factory()->create();
     }
 
     protected function getBooks(int $count = Constants::BOOKS_PER_PAGE, array $override = [], int $reviewCount = 0, ?User $user = null, ?Author $author = null): Book|Collection
@@ -106,7 +108,7 @@ abstract class TestCase extends BaseTestCase
             'summary' => 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum.',
             'cover' => UploadedFile::fake()->image('cover.jpg', width: $size, height: $size)->size(Constants::BOOK_COVER_MAX_WEIGHT / 2), // Assuming you want to test without a cover image
             'user_id' => $this->user->id,
-            'author_id' => Author::factory(),
+            'author_id' => $this->author->id,
         ];
     }
 

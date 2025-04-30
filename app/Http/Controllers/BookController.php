@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Constants;
 use App\Models\Book;
+use App\Models\Author;
 use App\Models\Review;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -70,7 +71,9 @@ class BookController extends Controller
             session()->put('url.back', url()->previous());
         }
 
-        return view('books.create');
+        $authors = Author::select('id', 'name')->orderBy('name')->get();
+
+        return view('books.create', compact('authors'));
     }
 
     public function store(BookRequest $request): RedirectResponse
@@ -78,9 +81,9 @@ class BookController extends Controller
         $book = new Book();
         $book->title = $request->input('title');
         $book->summary = $request->input('summary');
-        $book->author = $request->input('author');
         $book->published_at = $request->input('published_at');
         $book->user()->associate(Auth::user());
+        $book->author()->associate($request->input('author_id'));
         $book->save();
 
         if($request->hasFile('cover')) {
@@ -121,15 +124,17 @@ class BookController extends Controller
             session()->put('url.back', url()->previous());
         }
 
-        return view('books.edit', compact('book'));
+        $authors = Author::select('id', 'name')->orderBy('name')->get();
+
+        return view('books.edit', compact('book', 'authors'));
     }
 
     public function update(BookRequest $request, Book $book): RedirectResponse
     {
         $book->title = $request->input('title');
         $book->summary = $request->input('summary');
-        $book->author = $request->input('author');
         $book->published_at = $request->input('published_at');
+        $book->author()->associate($request->input('author_id'));
 
         if($request->hasFile('cover')) {
             $cover = $request->file('cover');

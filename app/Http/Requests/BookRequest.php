@@ -27,7 +27,7 @@ class BookRequest extends FormRequest
     {
         return [
             'title' => 'bail|required|string|max:' . Constants::STRING_MAX_LENGTH,
-            'author' => 'bail|required|string|max:' . Constants::STRING_MAX_LENGTH,
+            'author_id' => 'bail|required|integer|exists:authors,id',
             'published_at' => 'bail|required|date',
             'summary' => 'bail|required|string|min:' . Constants::BOOK_SUMMARY_MIN_LENGTH . '|max:' . Constants::BOOK_SUMMARY_MAX_LENGTH,
             'cover' => [

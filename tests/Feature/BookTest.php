@@ -2,9 +2,10 @@
 
 use App\Constants;
 use App\Models\Book;
+use App\Models\Author;
 use Illuminate\Support\Arr;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
@@ -94,7 +95,7 @@ test('books_show', function () {
         ->assertViewIs('books.show')
         ->assertViewHas('book', fn($viewBook) => $viewBook->is($book))
         ->assertSeeText($book->title)
-        ->assertSeeText($book->author)
+        ->assertSeeText($book->author->name)
         ->assertSeeText($book->summary)
         ->assertViewHas('reviews', fn($reviews) => $reviews->count() === 10)
         ->assertSeeText($book->reviews->first()->review)
@@ -148,21 +149,22 @@ test('books_show_hide_book_options', function () {
         ->assertDontSeeText(['Edit Book', 'Delete Book']);
 });
 
-test('book_create_auth', function () {
+test('books_create_auth', function () {
     $this->get(route('books.create'))
         ->assertStatus(302)
         ->assertRedirect(route('login'));
 });
 
-test('book_create', function () {
+test('books_create', function () {
     $this->actingAs($this->user)
         ->get(route('books.create'))
         ->assertStatus(200)
         ->assertViewIs('books.create')
+        ->assertViewHas('authors', fn($authors) => $authors->count() == Author::count())
         ->assertSeeText(['Add A Book', 'Title', 'Author', 'Published Date', 'Summary', 'Cover', 'Create']);
 });
 
-test('book_store_successfull', function () {
+test('books_store_successfull', function () {
     Storage::fake('public');
 
     $data = $this->getBookFormData();
@@ -180,22 +182,24 @@ test('book_store_successfull', function () {
     Storage::assertExists(Book::find(1)->first()->cover_image);
 });
 
-test('book_store_auth', function () {
+test('books_store_auth', function () {
     $this->post(route('books.store'), $this->getBookFormData())
         ->assertStatus(302)
         ->assertRedirect(route('login'));
 });
 
-test('book_store_validation', function () {
+test('books_store_validation', function () {
     Storage::fake('public');
 
     $this->checkForm(
         route('books.store'),
         $this->getBookFormData(),
         [
-            [['title', 'author', 'published_at', 'summary', 'cover'], 'required', ''],
-            [['title', 'author'], 'string', 0],
-            [['title', 'author'], 'max.string', str_repeat('a', Constants::STRING_MAX_LENGTH + 1), ['max' => Constants::STRING_MAX_LENGTH]],
+            [['title', 'author_id', 'published_at', 'summary', 'cover'], 'required', ''],
+            ['title', 'string', 0],
+            ['title', 'max.string', str_repeat('a', Constants::STRING_MAX_LENGTH + 1), ['max' => Constants::STRING_MAX_LENGTH]],
+            ['author_id', 'integer', 'invalid'],
+            ['author_id', 'exists', 0],
             [['published_at'], 'date', 'invalid-date'],
             [['summary'], 'min.string', str_repeat('a', Constants::BOOK_SUMMARY_MIN_LENGTH - 1), ['min' => Constants::BOOK_SUMMARY_MIN_LENGTH]],
             [['summary'], 'max.string', str_repeat('a', Constants::BOOK_SUMMARY_MAX_LENGTH + 1), ['max' => Constants::BOOK_SUMMARY_MAX_LENGTH]],
@@ -204,7 +208,7 @@ test('book_store_validation', function () {
     );
 }); 
 
-test('book_store_validation_cover', function () {
+test('books_store_validation_cover', function () {
     Storage::fake('public'); // Create a fake storage disk for testing
 
     $size = (Constants::BOOK_COVER_MIN_RES + Constants::BOOK_COVER_MAX_RES) / 2;
@@ -246,7 +250,7 @@ test('book_store_validation_cover', function () {
         ->assertInvalid(['cover' => Lang::get('validation.mimes', ['attribute' => 'cover', 'values' => implode(', ', Constants::IMAGE_EXTENSIONS_ALLOWED)])]);
 });
 
-test('book_delete_successfull', function () {
+test('books_delete_successfull', function () {
     $book = $this->getBooks(count: 1, user: $this->user);
 
     $this->actingAs($this->user)
@@ -257,7 +261,7 @@ test('book_delete_successfull', function () {
     $this->assertDatabaseMissing('books', $book->toArray());
 });
 
-test('book_delete_auth', function () {
+test('books_delete_auth', function () {
     $book = $this->getBooks(count: 1);
 
     $this->delete(route('books.destroy', $book))
@@ -265,13 +269,13 @@ test('book_delete_auth', function () {
         ->assertRedirect(route('login'));
 });
 
-test('book_delete_owner', function () {
+test('books_delete_owner', function () {
     $book = $this->getBooks(count: 1);
 
     $this->actingAs($this->user)->delete(route('books.destroy', $book))->assertForbidden();
 });
 
-test('book_edit', function () {
+test('books_edit', function () {
     $book = $this->getBooks(count: 1, user: $this->user);
 
     $this->actingAs($this->user)
@@ -279,22 +283,23 @@ test('book_edit', function () {
         ->assertStatus(200)
         ->assertViewIs('books.edit')
         ->assertViewHas('book', fn($viewBook) => $viewBook->is($book))
-        ->assertSee(['Title', $book->title, 'Author', $book->author, 'Published Date', Carbon::parse($book->published_at)->format('Y-m-d'), 'Summary', $book->summary, 'Cover', 'Edit']);
+        ->assertViewHas('authors', fn($authors) => $authors->count() == Author::count())
+        ->assertSee(['Title', $book->title, 'Author', $book->author->name, 'Published Date', Carbon::parse($book->published_at)->format('Y-m-d'), 'Summary', $book->summary, 'Cover', 'Edit']);
 });
 
-test('book_edit_auth', function () {
+test('books_edit_auth', function () {
     $book = $this->getBooks(count: 1);
 
     $this->get(route('books.edit', $book))->assertStatus(302)->assertRedirect(route('login'));
 });
 
-test('book_edit_owner', function () {
+test('books_edit_owner', function () {
     $book = $this->getBooks(count: 1);
 
     $this->actingAs($this->user)->get(route('books.edit', $book))->assertForbidden();;
 });
 
-test('book_update_successfull', function () {
+test('books_update_successfull', function () {
     $book = $this->getBooks(count: 1, user: $this->user);
 
     Storage::fake('public');
@@ -314,7 +319,7 @@ test('book_update_successfull', function () {
     Storage::assertExists(Book::find(1)->first()->cover_image);
 });
 
-test('book_update_cover_optional', function () {
+test('books_update_cover_optional', function () {
     $book = $this->getBooks(count: 1, user: $this->user);
 
     Storage::fake('public'); // Create a fake storage disk for testing
@@ -328,13 +333,13 @@ test('book_update_cover_optional', function () {
     expect($book->cover_image)->toBe(Book::find($book->id)->cover_image); //Logo info should not change
 });
 
-test('book_update_auth', function () {
+test('books_update_auth', function () {
     $book = $this->getBooks(count: 1);
 
     $this->put(route('books.update', $book), $this->getBookFormData())->assertStatus(302)->assertRedirect(route('login'));
 });
 
-test('book_update_owner', function () {
+test('books_update_owner', function () {
     $book = $this->getBooks(count: 1);
 
     $this->actingAs($this->user)->put(route('books.update', $book), $this->getBookFormData())->assertForbidden();;

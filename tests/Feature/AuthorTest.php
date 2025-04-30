@@ -4,7 +4,7 @@ use App\Constants;
 use App\Models\Author;
 
 test('authors_index', function () {
-    $authors = $this->getAuthors(Constants::AUTHOR_PER_PAGE);
+    $authors = $this->getAuthors(Constants::AUTHOR_PER_PAGE - 1); // One author is automatically created for each test
 
     $this->get(route('authors.index'))
         ->assertStatus(200)
@@ -17,7 +17,7 @@ test('authors_index', function () {
 });
 
 test('authors_index_pagination', function () {
-    $authors = $this->getAuthors(Constants::AUTHOR_PER_PAGE * 2);
+    $authors = $this->getAuthors(Constants::AUTHOR_PER_PAGE * 2 - 1); // One author is automatically created for each test
 
     $authors = $authors->sortBy([['name', 'asc']]); //Default sorting by name
 
@@ -35,7 +35,7 @@ test('authors_index_pagination', function () {
 });
 
 test('authors_index_sorting', function () {
-    $a = $this->getAuthors(count: Constants::AUTHOR_PER_PAGE * 2, createBooks: true);
+    $a = $this->getAuthors(count: Constants::AUTHOR_PER_PAGE * 2 - 1, createBooks: true);   // One author is automatically created for each test
 
     foreach (Constants::AUTHOR_SORTING as $key => $value) {
         $authors = Author::setSorting($key)->get();
@@ -50,7 +50,7 @@ test('authors_index_sorting', function () {
 test("authors_index_last_page", function () {
     $lastPage = 2;
 
-    $this->getAuthors(count: Constants::AUTHOR_PER_PAGE * $lastPage);
+    $this->getAuthors(count: Constants::AUTHOR_PER_PAGE * $lastPage - 1); // One author is automatically created for each test
 
     $this->get(route('authors.index', ['page' => $lastPage + 10]))
         ->assertRedirect(route('authors.index', ['page' => $lastPage]));

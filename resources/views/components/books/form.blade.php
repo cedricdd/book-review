@@ -1,4 +1,4 @@
-@props(['action' => 'Edit', 'book' => null])
+@props(['action' => 'Edit', 'authors', 'book' => null])
 
 <form action="{{ $action == 'Create' ? route('books.store') : route('books.update', $book) }}" method="POST" enctype="multipart/form-data">
     @csrf
@@ -10,7 +10,7 @@
         <x-forms.input name='title' label='Title' value="{{ old('title', $book?->title) }}" required />
     </div>
     <div class="mb-4">
-        <x-forms.input name='author' label='Author' value="{{ old('author', $book?->author) }}" required />
+        <x-forms.select name='author_id' label='Author' :items='$authors->pluck("name", "id")' :current="old('author_id', $book?->author->id)" required />
     </div>
     <div class="mb-4">
         <x-forms.input 
