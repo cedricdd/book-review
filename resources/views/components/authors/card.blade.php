@@ -19,9 +19,12 @@
         </div>
         <div>
             <b>Books:</b>
-            <div class="flex flex-wrap gap-2 mt-2">
+            <div class="flex flex-wrap gap-2 mt-2 text-center">
                 @foreach ($author->books as $book)
-                    <a href="{{ route('books.show', $book) }}" class="bg-white/10 hover:bg-white/15 px-2 py-1 rounded">{{ $book->title }}</a>
+                    <a href="{{ route('books.show', $book) }}" class="bg-white/10 hover:bg-white/15 px-2 py-1 rounded flex-grow">
+                        {{ $book->title }}
+                        <x-star-rating :rating='$book->reviews_avg_rating' />
+                    </a>
                 @endforeach
             </div>
         </div>

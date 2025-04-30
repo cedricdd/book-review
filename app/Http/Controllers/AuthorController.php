@@ -14,7 +14,7 @@ class AuthorController extends Controller
     public function index(Request $request): RedirectResponse|View
     {
         // Fetch authors from the database
-        $authors = Author::withCount('books')->with(['books' => fn($query) => $query->select('id', 'title', 'author_id')->orderBy('title')])
+        $authors = Author::withCount('books')->with(['books' => fn($query) => $query->select('id', 'title', 'author_id')->withAvg('reviews', 'rating')->orderBy('title')])
             ->setSorting(session('author-sorting', Constants::AUTHOR_SORTING_DEFAULT))
             ->paginate(Constants::AUTHOR_PER_PAGE);
 

@@ -18,7 +18,7 @@
                 <img loading="lazy" style="width:50px;" src="{{ Vite::asset('resources/images/logo.jpg') }}"
                     alt="logo" />
             </a>
-            <div>
+            <div class="flex justify-center items-center gap-2 flex-wrap">
                 <x-nav-link name='authors.index'>Authors</x-nav-link>
                 @auth
                     <x-nav-link name='books.create'>Add Book</x-nav-link>
