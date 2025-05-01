@@ -46,4 +46,29 @@ class Constants
     const BOOK_COVER_MAX_RES = 1000;
 
     const CACHE_REVIEWS = 60*60*24; // 24 hours
+    const CACHE_CATEGORIES = 60*60*24; // 24 hours
+
+    const CATEGORIES = [
+        'Romance',
+        'Drama',
+        'Science Fiction',
+        'Fantasy',
+        'Mystery',
+        'Thriller',
+        'Horror',
+        'Historical',
+        'Biography',
+        'Self-Help',
+        'Non-Fiction',
+        'Young Adult',
+        'Children',
+        'Adventure',
+        'Classic',
+        'Poetry',
+        'Graphic Novel',
+        'Memoir',
+        'Crime',
+        'Dystopian'
+    ];
+    const MIN_REVIEWS_FOR_CATEGORY_COVER = 5;
 }

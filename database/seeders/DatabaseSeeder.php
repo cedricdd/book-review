@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Book;
+use App\Constants;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Book;
 use App\Models\User;
 use App\Models\Author;
 use App\Models\Review;
@@ -59,37 +60,14 @@ class DatabaseSeeder extends Seeder
             Review::factory()->for($book, 'book')->for($johnDoe, 'user')->create();
         }
 
-        $categories = [
-            'Romance',
-            'Drama',
-            'Science Fiction',
-            'Fantasy',
-            'Mystery',
-            'Thriller',
-            'Horror',
-            'Historical',
-            'Biography',
-            'Self-Help',
-            'Non-Fiction',
-            'Young Adult',
-            'Children',
-            'Adventure',
-            'Classic',
-            'Poetry',
-            'Graphic Novel',
-            'Memoir',
-            'Crime',
-            'Dystopian'
-        ];
-
-        foreach ($categories as $name) {
+        foreach (Constants::CATEGORIES as $name) {
             $category = new Category();
             $category->name = $name;
             $category->slug = Str::slug($name);
             $category->save();
         }
 
-        $categoryIDs = range(1, count($categories));
+        $categoryIDs = range(1, count(Constants::CATEGORIES));
 
         foreach(Book::select('id')->get() as $book) {
             shuffle($categoryIDs);

@@ -3,9 +3,11 @@
 use App\Http\Controllers\AuthorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReviewController;
+use App\Models\Category;
 
 Route::get('/', [BookController::class, 'index'])->name('books.index');
 Route::get('books/create', [BookController::class, 'create'])->name('books.create')->middleware('auth');
@@ -24,6 +26,9 @@ Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('r
 
 Route::get('authors', [AuthorController::class, 'index'])->name('authors.index');
 Route::get('authors/{author}', [AuthorController::class, 'show'])->name('authors.show');
+
+Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 
 Route::post('sorting/{type}', [SiteController::class, 'sorting'])->name('sorting')->where('type', '[a-z]+');
 

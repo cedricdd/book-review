@@ -20,6 +20,7 @@
             </a>
             <div class="flex justify-center items-center gap-2 flex-wrap">
                 <x-nav-link name='authors.index'>Authors</x-nav-link>
+                <x-nav-link name='categories.index'>Categories</x-nav-link>
                 @auth
                     <x-nav-link name='books.create'>Add Book</x-nav-link>
                     @if ($book_count = Auth::user()->books()->count())
