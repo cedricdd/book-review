@@ -8,5 +8,5 @@
         <p class="mb-4">Please fill in the details of the book you want to add.</p>
     </div>
 
-    <x-books.form action='Create' :$authors />
+    <x-books.form action='Create' />
 @endsection

@@ -7,6 +7,8 @@ use App\Models\Book;
 use App\Models\User;
 use App\Models\Author;
 use App\Models\Review;
+use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Database\Eloquent\Collection;
@@ -16,6 +18,7 @@ abstract class TestCase extends BaseTestCase
 {
     protected User $user;
     protected Author $author;
+    protected Collection $categories;
 
     protected function setUp(): void
     {
@@ -23,6 +26,16 @@ abstract class TestCase extends BaseTestCase
 
         $this->user = User::factory()->create();
         $this->author = Author::factory()->create();
+        $this->categories = new Collection();
+
+        foreach (Constants::CATEGORIES as $name) {
+            $category = new Category();
+            $category->name = $name;
+            $category->slug = Str::slug($name);
+            $category->save();
+    
+            $this->categories[] = $category;
+        }
     }
 
     protected function getBooks(int $count = Constants::BOOKS_PER_PAGE, array $override = [], int $reviewCount = 0, ?User $user = null, ?Author $author = null): Book|Collection
@@ -109,6 +122,7 @@ abstract class TestCase extends BaseTestCase
             'cover' => UploadedFile::fake()->image('cover.jpg', width: $size, height: $size)->size(Constants::BOOK_COVER_MAX_WEIGHT / 2), // Assuming you want to test without a cover image
             'user_id' => $this->user->id,
             'author_id' => $this->author->id,
+            'categories' => [1, 8, 16],
         ];
     }
 

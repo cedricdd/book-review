@@ -30,6 +30,7 @@ class BookRequest extends FormRequest
             'author_id' => 'bail|required|integer|exists:authors,id',
             'published_at' => 'bail|required|date',
             'summary' => 'bail|required|string|min:' . Constants::BOOK_SUMMARY_MIN_LENGTH . '|max:' . Constants::BOOK_SUMMARY_MAX_LENGTH,
+            'categories' => 'bail|array|min:' . Constants::MIN_CATEGORIES_FOR_BOOK . '|max:' . Constants::MAX_CATEGORIES_FOR_BOOK . '|exists:categories,id',
             'cover' => [
                 'bail', 
                 Rule::requiredIf($this->routeIs('books.store')),

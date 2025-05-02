@@ -9,6 +9,7 @@ use App\Models\Review;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Http\Requests\BookRequest;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
@@ -65,9 +66,7 @@ class BookController extends Controller
             session()->put('url.back', url()->previous());
         }
 
-        $authors = Author::select('id', 'name')->orderBy('name')->get();
-
-        return view('books.create', compact('authors'));
+        return view('books.create');
     }
 
     public function store(BookRequest $request): RedirectResponse
@@ -76,9 +75,12 @@ class BookController extends Controller
         $book->title = $request->input('title');
         $book->summary = $request->input('summary');
         $book->published_at = $request->input('published_at');
+
         $book->user()->associate(Auth::user());
         $book->author()->associate($request->input('author_id'));
         $book->save();
+
+        $book->categories()->attach($request->input('categories'));
 
         if($request->hasFile('cover')) {
             $cover = $request->file('cover');
@@ -114,9 +116,7 @@ class BookController extends Controller
             session()->put('url.back', url()->previous());
         }
 
-        $authors = Author::select('id', 'name')->orderBy('name')->get();
-
-        return view('books.edit', compact('book', 'authors'));
+        return view('books.edit', compact('book'));
     }
 
     public function update(BookRequest $request, Book $book): RedirectResponse
@@ -124,7 +124,10 @@ class BookController extends Controller
         $book->title = $request->input('title');
         $book->summary = $request->input('summary');
         $book->published_at = $request->input('published_at');
+
         $book->author()->associate($request->input('author_id'));
+
+        $book->categories()->sync($request->input('categories'));
 
         if($request->hasFile('cover')) {
             $cover = $request->file('cover');

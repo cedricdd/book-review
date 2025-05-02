@@ -1,24 +1,7 @@
 <?php
 
 use App\Constants;
-use App\Models\Book;
-use App\Models\Review;
-use App\Models\Category;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-
-beforeEach(function () {
-    $this->categories = collect();
-
-    foreach (Constants::CATEGORIES as $name) {
-        $category = new Category();
-        $category->name = $name;
-        $category->slug = Str::slug($name);
-        $category->save();
-
-        $this->categories[] = $category;
-    }
-});
 
 test('categories_index', function () {
     //We need to create books with reviews for each category

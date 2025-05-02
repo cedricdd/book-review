@@ -71,4 +71,6 @@ class Constants
         'Dystopian'
     ];
     const MIN_REVIEWS_FOR_CATEGORY_COVER = 5;
+    const MIN_CATEGORIES_FOR_BOOK = 1;
+    const MAX_CATEGORIES_FOR_BOOK = 5;
 }

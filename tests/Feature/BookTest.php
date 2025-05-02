@@ -160,8 +160,8 @@ test('books_create', function () {
         ->get(route('books.create'))
         ->assertStatus(200)
         ->assertViewIs('books.create')
-        ->assertViewHas('authors', fn($authors) => $authors->count() == Author::count())
-        ->assertSeeText(['Add A Book', 'Title', 'Author', 'Published Date', 'Summary', 'Cover', 'Create']);
+        ->assertSeeText(['Add A Book', 'Title', 'Author', 'Published Date', 'Summary', 'Categories', 'Cover', 'Create'])
+        ->assertSeeText($this->categories->pluck('name')->toArray());
 });
 
 test('books_store_successfull', function () {
@@ -176,7 +176,15 @@ test('books_store_successfull', function () {
         ->assertRedirectToRoute('books.show', 1)
         ->assertSessionHas('success');
 
-    $this->assertDatabaseHas('books', Arr::except($data, 'cover'));
+    $this->assertDatabaseHas('books', Arr::except($data, ['cover', 'categories']));
+
+    //Check if the book is associated with the categories
+    foreach($data['categories'] as $categoryID) {
+        $this->assertDatabaseHas('book_category', [
+            'book_id' => 1,
+            'category_id' => $categoryID,
+        ]);
+    }
 
     //Check if the cover was uploaded
     Storage::assertExists(Book::find(1)->first()->cover_image);
@@ -200,9 +208,13 @@ test('books_store_validation', function () {
             ['title', 'max.string', str_repeat('a', Constants::STRING_MAX_LENGTH + 1), ['max' => Constants::STRING_MAX_LENGTH]],
             ['author_id', 'integer', 'invalid'],
             ['author_id', 'exists', 0],
-            [['published_at'], 'date', 'invalid-date'],
-            [['summary'], 'min.string', str_repeat('a', Constants::BOOK_SUMMARY_MIN_LENGTH - 1), ['min' => Constants::BOOK_SUMMARY_MIN_LENGTH]],
-            [['summary'], 'max.string', str_repeat('a', Constants::BOOK_SUMMARY_MAX_LENGTH + 1), ['max' => Constants::BOOK_SUMMARY_MAX_LENGTH]],
+            ['published_at', 'date', 'invalid-date'],
+            ['summary', 'min.string', str_repeat('a', Constants::BOOK_SUMMARY_MIN_LENGTH - 1), ['min' => Constants::BOOK_SUMMARY_MIN_LENGTH]],
+            ['summary', 'max.string', str_repeat('a', Constants::BOOK_SUMMARY_MAX_LENGTH + 1), ['max' => Constants::BOOK_SUMMARY_MAX_LENGTH]],
+            ['categories', 'array', 'invalid'],
+            ['categories', 'min.array', [], ['min' => Constants::MIN_CATEGORIES_FOR_BOOK]],
+            ['categories', 'max.array', range(1, Constants::MAX_CATEGORIES_FOR_BOOK + 1), ['max' => Constants::MAX_CATEGORIES_FOR_BOOK]],
+            ['categories', 'exists', [0]],
         ],
         $this->user,
     );
@@ -283,8 +295,8 @@ test('books_edit', function () {
         ->assertStatus(200)
         ->assertViewIs('books.edit')
         ->assertViewHas('book', fn($viewBook) => $viewBook->is($book))
-        ->assertViewHas('authors', fn($authors) => $authors->count() == Author::count())
-        ->assertSee(['Title', $book->title, 'Author', $book->author->name, 'Published Date', Carbon::parse($book->published_at)->format('Y-m-d'), 'Summary', $book->summary, 'Cover', 'Edit']);
+        ->assertSee(['Title', $book->title, 'Author', $book->author->name, 'Published Date', Carbon::parse($book->published_at)->format('Y-m-d'), 'Summary', $book->summary, 'Categories', 'Cover', 'Edit'])
+        ->assertSeeText($this->categories->pluck('name')->toArray());
 });
 
 test('books_edit_auth', function () {
@@ -301,7 +313,8 @@ test('books_edit_owner', function () {
 
 test('books_update_successfull', function () {
     $book = $this->getBooks(count: 1, user: $this->user);
-
+    $book->categories()->attach([1, 2, 3]); 
+    
     Storage::fake('public');
 
     $data = $this->getBookFormData();
@@ -313,8 +326,19 @@ test('books_update_successfull', function () {
         ->assertRedirectToRoute('books.show', $book)
         ->assertSessionHas('success');
 
-    $this->assertDatabaseHas('books', Arr::except($data, 'cover'));
+    $this->assertDatabaseHas('books', Arr::except($data, ['cover', 'categories']));
 
+    //Check if the book is associated with the categories
+    foreach($data['categories'] as $categoryID) {
+        $this->assertDatabaseHas('book_category', [
+            'book_id' => $book->id,
+            'category_id' => $categoryID,
+        ]);
+    }
+
+    //Make sure the number of categories is correct
+    expect($book->categories()->count())->toBe(count($data['categories']));
+    
     //Check if the cover was uploaded
     Storage::assertExists(Book::find(1)->first()->cover_image);
 });

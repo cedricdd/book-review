@@ -5,5 +5,5 @@
 @section('content')
     <x-header-title>Edit {{ $book->title }}</x-header-title>
 
-    <x-books.form action='Edit' :$book :$authors />
+    <x-books.form action='Edit' :$book />
 @endsection
