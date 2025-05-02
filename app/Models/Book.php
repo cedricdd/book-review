@@ -70,7 +70,7 @@ class Book extends Model
         return match ($sorting) {
             'title' => $query->orderBy('title', 'asc'),
             'newest' => $query->orderBy('created_at', 'desc'),
-            'author' => $query->orderBy('author', 'asc')->orderBy('title', 'asc'),
+            'author' => $query->join('authors', 'books.author_id', '=', 'authors.id')->orderBy('authors.name', 'asc')->orderBy('title', 'asc'),
             'popular_month' => $query->popular(now()->subMonth(), now())->orderBy('reviews_avg_rating', 'desc'),
             'popular_6_months' => $query->popular(now()->subMonths(6), now())->orderBy('reviews_avg_rating', 'desc'),
             'popular_all' => $query->popular()->orderBy('reviews_avg_rating', 'desc'),
