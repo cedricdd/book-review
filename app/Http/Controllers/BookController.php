@@ -20,7 +20,7 @@ class BookController extends Controller
         $term = trim(htmlspecialchars($request->input('q', '')));
 
         // Fetch books from the database, applying the search filter if provided
-        $books = Book::with('author')
+        $books = Book::with(['author', 'categories' => fn($query) => $query->orderBy('name')])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
             ->when($term, fn($query) => $query->where('title', 'LIKE', "%{$term}%"))
@@ -52,6 +52,8 @@ class BookController extends Controller
             $reviews = $reviews->filter(fn($review) => !($review->user_id === Auth::id()));
         }
         else $userReview = null;
+
+        $book->load(['categories' => fn($query) => $query->orderBy('name')]);
 
         // Return the view with the book
         return view('books.show', compact('book', 'reviews', 'rating', 'userReview'));
@@ -97,7 +99,11 @@ class BookController extends Controller
 
     public function owner(Request $request): View
     {
-        $books = $request->user()->books()->withCount('reviews')->withAvg('reviews', 'rating')->latest()->get();
+        $books = $request->user()->books()
+            ->with(['author', 'categories' => fn($query) => $query->orderBy('name')])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
+            ->latest()->get();
 
         return view('books.owner', compact('books',));
     }

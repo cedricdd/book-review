@@ -19,6 +19,14 @@
                         <p>{{ $rating }}/5</p>
                     </div>
                 @endif
+
+                <div class="flex gap-2 justify-center items-center flex-wrap mt-6">
+                    @foreach($book->categories as $category)
+                    <x-link-button :color="$loop->even ? 'blue' : 'green'" size='small' href="{{ route('categories.show', $category) }}">
+                        {{ $category->name }}
+                    </x-link-button>
+                @endforeach
+                </div>
             </div>
         </div>
         <p class="p-4 rounded my-4 border border-2 border-white/25">Summary: {{ $book->summary }}</p>

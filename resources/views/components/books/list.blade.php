@@ -19,6 +19,14 @@
             <p class="text-gray-400 mt-1">by <a
                     href="{{ route('authors.show', $book->author) }}">{{ $book->author->name }}</a></p>
             <p class="mt-4">{{ $book->summary }}</p>
+
+            <div class="flex gap-2 items-center flex-wrap mt-6">
+                @foreach($book->categories as $category)
+                    <x-link-button :color="$loop->even ? 'blue' : 'green'" size='small' href="{{ route('categories.show', $category) }}">
+                        {{ $category->name }}
+                    </x-link-button>
+                @endforeach
+            </div>
         </div>
         <div class="w-[135px] text-center">
             @if ($book->reviews_count != 0)

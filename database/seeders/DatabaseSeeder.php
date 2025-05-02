@@ -22,11 +22,21 @@ class DatabaseSeeder extends Seeder
         define('USER_COUNT', 250);
         define('AUTHOR_COUNT', 250);
 
-        $authors = Author::factory()->count(AUTHOR_COUNT)->create()->each(function ($author)  {
+        $authors = Author::factory()->count(AUTHOR_COUNT)->create()->each(function ($author) {
             Book::factory()->count(random_int(1, 10))->for($author, 'author')->create();
         });
 
+        //Create a user with the name "John Doe" and assign them 10 books
+        $johnDoe = User::factory()->johnDoe()->create();
+
+        Book::factory()->count(10)->for($johnDoe, 'user')->create();
+
         $books = Book::select('id')->get();
+
+        //Our user's reviews
+        foreach ($books->shuffle()->slice(0, 20) as $book) {
+            Review::factory()->for($book, 'book')->for($johnDoe, 'user')->create();
+        }
 
         //Generic reviews
         for ($i = 0; $i < USER_COUNT; $i++) {
@@ -53,13 +63,6 @@ class DatabaseSeeder extends Seeder
             }
         });
 
-        //Our user's books & reviews
-        $johnDoe = User::factory()->johnDoe()->create();
-
-        foreach ($books->shuffle()->slice(0, 20) as $book) {
-            Review::factory()->for($book, 'book')->for($johnDoe, 'user')->create();
-        }
-
         foreach (Constants::CATEGORIES as $name) {
             $category = new Category();
             $category->name = $name;
@@ -69,7 +72,7 @@ class DatabaseSeeder extends Seeder
 
         $categoryIDs = range(1, count(Constants::CATEGORIES));
 
-        foreach(Book::select('id')->get() as $book) {
+        foreach (Book::select('id')->get() as $book) {
             shuffle($categoryIDs);
 
             $book->categories()->attach(array_slice($categoryIDs, 0, random_int(1, 5)));

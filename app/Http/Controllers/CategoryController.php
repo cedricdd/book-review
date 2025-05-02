@@ -101,7 +101,7 @@ class CategoryController extends Controller
     public function show(Request $request, Category $category): RedirectResponse|View
     {
         $books = $category->books()
-            ->with('author')
+            ->with(['author', 'categories' => fn($query) => $query->orderBy('name')])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
             ->setSorting(session('book-sorting', Constants::BOOK_SORTING_DEFAULT))
