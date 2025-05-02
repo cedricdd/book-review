@@ -12,7 +12,7 @@ test('authors_index', function () {
         ->assertViewHas('authors', fn ($viewAuthors) => $viewAuthors->count() === Constants::AUTHOR_PER_PAGE)
         ->assertViewHas('authors', fn ($viewAuthors) => $viewAuthors->contains($authors->first()))
         ->assertViewHas('authors', fn ($viewAuthors) => $viewAuthors->contains($authors->last()))
-        ->assertSeeText(['Authors', $authors->first()->name, $authors->first()->biography, $authors->last()->name, $authors->last()->biography])
+        ->assertSee(['Authors', $authors->first()->name, $authors->first()->biography, $authors->last()->name, $authors->last()->biography])
         ->assertSee([route('authors.show', $authors->first()), route('authors.show', $authors->last())]);
 });
 

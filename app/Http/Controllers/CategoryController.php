@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Constants;
+use App\Models\Category;
+use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $categories = Cache::remember('categories_index', Constants::CACHE_CATEGORIES, function () {
             $results = DB::select("
@@ -93,5 +96,21 @@ class CategoryController extends Controller
         });
 
         return view('categories.index', compact('categories'));
+    }
+
+    public function show(Request $request, Category $category): RedirectResponse|View
+    {
+        $books = $category->books()
+            ->with('author')
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
+            ->setSorting(session('book-sorting', Constants::BOOK_SORTING_DEFAULT))
+            ->paginate(Constants::BOOKS_PER_PAGE);
+
+        if ($request->has('page') && $request->input('page') > $books->lastPage()) {
+            return redirect()->route('categories.show', [$category, 'page' => $books->lastPage()]);
+        }
+
+        return view('categories.show', compact('category', 'books'));
     }
 }

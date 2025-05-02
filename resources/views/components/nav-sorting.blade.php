@@ -18,7 +18,7 @@
     <form action="{{ route('sorting', $type) }}" method="POST" class="flex justify-center items-center flex-wrap gap-2">
         @csrf
         @foreach ($elements as $name => $sorting)
-            <x-forms.button name="sorting" value="{{ $name }}" class="justify-between!">
+            <x-forms.button name="sorting" value="{{ $name }}" class="justify-between!" :disabled="$session == $name">
                 @if ($session == $name)
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
