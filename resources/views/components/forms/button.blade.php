@@ -1,7 +1,7 @@
-@props(['color' => 'white'])
+@props(['color' => 'white', 'disabled' => false])
 
 @php
-    $class = "flex justify-center items-center gap-x-2 min-w-[100px] rounded-lg text-sm w-full sm:w-auto px-5 py-1.5 sm:py-2.5 cursor-pointer font-bold";
+    $class = "flex justify-center items-center gap-x-2 min-w-[100px] rounded-lg text-sm w-full sm:w-auto px-5 py-1.5 sm:py-2.5 font-bold";
 
     switch ($color) {
         case 'blue':
@@ -16,6 +16,12 @@
         default:
             $class .= ' text-black bg-white/90 border-white hover:bg-white focus:ring-white/50';
     }
+
+    if ($disabled) {
+        $class .= ' opacity-75 pointer-events-none hover:bg-inherit';
+    } else {
+        $class .= ' cursor-pointer';
+    }
 @endphp
 
-<button type="submit" {{ $attributes->merge(['class' => $class]) }}>{{ $slot }}</button>
+<button type="submit" @if($disabled) disabled @endif {{ $attributes->merge(['class' => $class]) }}>{{ $slot }}</button>
