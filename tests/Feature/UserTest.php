@@ -2,7 +2,6 @@
 
 use App\Constants;
 use App\Models\Review;
-use PHPUnit\TextUI\Configuration\Constant;
 
 test('profile', function () {
     $reviews = $this->getReviews(count: Constants::REVIEW_PER_PAGE * 2, user: $this->user)->sortBy([['created_at', 'desc']]);
@@ -33,6 +32,18 @@ test('profile_sorting', function () {
             ->assertViewHas('reviews', fn($viewReviews) => $viewReviews->first()->is($reviews->first()))
             ->assertViewHas('reviews', fn($viewReviews) => !$viewReviews->contains($reviews->last()));
     }
+});
+
+test('profile_pagination', function () {
+    $this->getReviews(count: Constants::REVIEW_PER_PAGE * 2, user: $this->user);
+
+    $reviews = $this->user->reviews()->with('book')->setSorting(Constants::REVIEW_SORTING_DEFAULT)->get();
+
+    $this->get(route('users.profile', $this->user))
+        ->assertStatus(200)
+        ->assertViewHas('reviews', fn($viewReviews) => $viewReviews->count() === Constants::REVIEW_PER_PAGE)
+        ->assertViewHas('reviews', fn($viewReviews) => $viewReviews->contains($reviews->first()))
+        ->assertViewHas('reviews', fn($viewReviews) => !$viewReviews->contains($reviews->last()));
 });
 
 test('profile_redirects_last_page', function () {

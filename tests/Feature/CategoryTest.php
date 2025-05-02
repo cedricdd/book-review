@@ -72,10 +72,10 @@ test('categories_show_pagination', function () {
     $category = $this->categories->first();
 
     //We need to create books with reviews for each category
-    $books = $this->getBooks(count: Constants::BOOKS_PER_PAGE * 2, reviewCount: 10)
+    $this->getBooks(count: Constants::BOOKS_PER_PAGE * 2, reviewCount: 10)
         ->each(fn($book) => $book->categories()->attach($category));
 
-    $books = $books->sortBy('title'); // Sort books by title to ensure pagination works correctly, default sorting
+    $books = $category->books()->setSorting(Constants::BOOK_SORTING_DEFAULT)->get();
 
     $this->get(route('categories.show',$category))
         ->assertStatus(200)

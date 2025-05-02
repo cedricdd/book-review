@@ -2,7 +2,6 @@
 
 use App\Constants;
 use App\Models\Book;
-use App\Models\Author;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
@@ -44,9 +43,9 @@ test('books_index_search', function () {
 });
 
 test('books_index_pagination', function () {
-    $books = $this->getBooks(Constants::BOOKS_PER_PAGE * 2);
+    $this->getBooks(Constants::BOOKS_PER_PAGE * 2);
 
-    $books = $books->sortBy([['title', 'asc']]);
+    $books = Book::setSorting(Constants::BOOK_SORTING_DEFAULT)->get();
 
     $this->get(route('books.index'))
         ->assertViewHas('books', fn($viewBooks) => $viewBooks->count() === Constants::BOOKS_PER_PAGE)

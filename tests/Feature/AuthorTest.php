@@ -17,9 +17,9 @@ test('authors_index', function () {
 });
 
 test('authors_index_pagination', function () {
-    $authors = $this->getAuthors(Constants::AUTHOR_PER_PAGE * 2 - 1); // One author is automatically created for each test
+    $this->getAuthors(Constants::AUTHOR_PER_PAGE * 2 - 1); // One author is automatically created for each test
 
-    $authors = $authors->sortBy([['name', 'asc']]); //Default sorting by name
+    $authors = Author::setSorting(Constants::AUTHOR_SORTING_DEFAULT)->get();
 
     $this->get(route('authors.index'))
         ->assertViewHas('authors', fn($viewAuthors) => $viewAuthors->count() === Constants::AUTHOR_PER_PAGE)
