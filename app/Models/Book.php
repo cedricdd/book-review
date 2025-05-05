@@ -47,7 +47,7 @@ class Book extends Model
     {
         return $query->withAvg([
             'reviews as highest_order' => fn($query) => $this->filterByDateRange($query, $start, $end),
-        ], 'rating')->orderBy('highest_order', 'desc');
+        ], 'rating')->minReviews(5)->orderBy('highest_order', 'desc');
     }
 
     private function filterByDateRange(Builder $query, ?string $start, ?string $end): Builder
@@ -58,7 +58,7 @@ class Book extends Model
 
     public function scopeMinReviews(Builder $query, int $min): Builder
     {
-        return $query->withCount('reviews')->having('reviews_count', '>=', $min);
+        return $query->having('reviews_count', '>=', $min);
     }
 
     public function getRatingAttribute() {
