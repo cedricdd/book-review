@@ -23,8 +23,8 @@ class ReviewFactory extends Factory
             'rating' => fake()->numberBetween(0, 10) / 2,
             'user_id' => User::factory(),
             'book_id' => Book::factory(),
-            'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
-            'updated_at' => fake()->dateTimeBetween('created_at', 'now'),
+            'created_at' => ($date = fake()->dateTimeBetween('-1 year', 'now')),
+            'updated_at' => (clone $date)->modify('+' . (random_int(0, 1) ? random_int(1, 43200) : 0) . ' minutes'),
         ];
     }
 
