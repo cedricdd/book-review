@@ -149,7 +149,7 @@ abstract class TestCase extends BaseTestCase
 
             foreach ($fields as $field) {
                 //Get the error message based on the rule used
-                $attribute = Lang::has("validation.attributes.{$field}") ? Lang::get("validation.attributes.{$field}") : $field;
+                $attribute = Lang::has("validation.attributes.{$field}") ? Lang::get("validation.attributes.{$field}") : str_replace('_', ' ', $field);
                 $error = Lang::get("validation.{$infos[1]}", compact('attribute') + ($infos[3] ?? []));
 
                 // dump("Checking field: {$field} with value: {$infos[2]} and error: {$error}");
